@@ -54,9 +54,9 @@ public class FileService {
 
         Optional<Post> getPost = postRepository.findById(id);
         if(getPost.isEmpty())
-            return ResponseDto.fail("POST_NOT_FOUND", "게시글을 찾을 수 없습니다.");
+            return ResponseDto.fail("게시글을 찾을 수 없습니다.");
         if(getPost.get().validateMember(updateMember))
-            return ResponseDto.fail("AUTHOR_NOT_MATCHED", "작성자가 아닙니다.");
+            return ResponseDto.fail("작성자가 아닙니다.");
 
         ImageFile getCurrentFile = filesRepository.findByUrl(getPost.get().getImageUrl());
         filesRepository.deleteById(getCurrentFile.getId());
@@ -81,9 +81,9 @@ public class FileService {
 
         Optional<Post> getPost = postRepository.findById(id);
         if(getPost.isEmpty())
-            return ResponseDto.fail("POST_NOT_FOUND", "게시글을 찾을 수 없습니다.");
+            return ResponseDto.fail("게시글을 찾을 수 없습니다.");
         if(getPost.get().validateMember(updateMember))
-            return ResponseDto.fail("AUTHOR_NOT_MATCHED", "작성자가 아닙니다.");
+            return ResponseDto.fail("작성자가 아닙니다.");
 
         ImageFile getCurrentFile = filesRepository.findByUrl(responseDto.getImageUrl());
         filesRepository.deleteById(getCurrentFile.getId());
@@ -93,11 +93,11 @@ public class FileService {
 
     private ResponseDto<?> validateCheck(HttpServletRequest request) {
         if(null == request.getHeader("RefreshToken") || null == request.getHeader("Authorization")) {
-            return ResponseDto.fail("MEMBER_NOT_FOUND", "로그인이 필요합니다.");
+            return ResponseDto.fail("로그인이 필요합니다.");
         }
         Member member = validateMember(request);
         if(null == member) {
-            return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+            return ResponseDto.fail("Token이 유효하지 않습니다.");
         }
         return ResponseDto.success(member);
     }
