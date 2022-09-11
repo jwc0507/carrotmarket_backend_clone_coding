@@ -1,7 +1,6 @@
 package com.example.week7project.dto.request;
 
 
-import com.example.week7project.domain.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -10,9 +9,9 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 public class PostRequestDto {
-    private final String title;
-    private final long price;
-    private final String imageUrl;
-    private final String category;
-    private final String content;
+    private String title;
+    private Long price;
+    private String imageUrl;
+    private String category;
+    private String content;
 }
