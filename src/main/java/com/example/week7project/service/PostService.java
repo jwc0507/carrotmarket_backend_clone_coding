@@ -148,9 +148,7 @@ public class PostService {
     //게시글 삭제
     @Transactional
     public ResponseDto<String> deletePost(Long id) {
-        Post post = postRepository.findById(id).orElseThrow( //findById로 레코드 조회할 때, orElseThrow 함수로 예외처리 안하면 에러 발생.
-                () -> new IllegalArgumentException("해당 아이디가 존재하지 않습니다.")
-        );//optional로 바꾸기
+        Post post = isPresentPost(id);
         if(post == null)
             return ResponseDto.fail("DELETE_FAILDED","글 삭제에 실패하였습니다.");
         else {
@@ -170,6 +168,4 @@ public class PostService {
         }
         return tokenProvider.getMemberFromAuthentication();
     }
-
-
 }
