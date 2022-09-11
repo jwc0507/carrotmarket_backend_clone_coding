@@ -36,28 +36,20 @@ public class MyPageService {
     public ResponseDto<?> updateProfile(UpdateProfileDto updateProfileDto, HttpServletRequest request) {
 
         //== token 유효성 검사 ==//
-        // RefreshToken 유효성 검사
-        if (null == request.getHeader("RefreshToken")) {
-            return ResponseDto.fail("수정 실패");
-        }
-        // Authorization 유효성 검사
-        if (null == request.getHeader("Authorization")) {
-            return ResponseDto.fail("수정 실패");
-        }
+        ResponseDto<?> chkResponse = validateCheck(request);
 
-        Member member = validateMember(request);
+        if(!chkResponse.isSuccess())
+            return chkResponse;
 
-        // token 정보 유효성 검사
-        if (null == member) {
-            return ResponseDto.fail("수정 실패");
-        }
+        Member member = (Member) chkResponse.getData();
+
         // 객체 DB에서 가져오기.
         member.builder()
                 .phoneNumber(member.getPhoneNumber())
                 .nickname(updateProfileDto.getNickName())
                 .address(updateProfileDto.getAddress())
                 .temperature(member.getTemperature());
-        memberRepository.save(member);          //== 추후 얘기 후 변경 예정 ==// ==> Entity 에 update기능을 넣을 것인지?
+        memberRepository.save(member);
         return ResponseDto.success(member.getNickname() + "수정완료");
     }
 
@@ -75,6 +67,9 @@ public class MyPageService {
         Member member = (Member) chkResponse.getData();
 
         List<Post> sellList = postRepository.findByMemberId(member.getId());
+        if (sellList.isEmpty())
+            return ResponseDto.fail("판매한 내역이 없습니다.");
+
         List<MyPostDto> myPostDtoList = new ArrayList<>();
         for (Post post : sellList) {
             myPostDtoList.add(
@@ -102,6 +97,9 @@ public class MyPageService {
         Member member = (Member) chkResponse.getData();
 
         List<PurchaseList> purchaseList = purchaseListRepository.findByMemberId(member.getId());
+        if (purchaseList.isEmpty())
+            return ResponseDto.fail("구매한 내역이 없습니다.");
+
         List<MyPostDto> myPostDtoList = new ArrayList<>();
         for (PurchaseList list : purchaseList) {
             myPostDtoList.add(
@@ -129,6 +127,9 @@ public class MyPageService {
         Member member = (Member) chkResponse.getData();
 
         List<WishList> wishList = wishListRepository.findByMemberId(member.getId());
+        if (wishList.isEmpty())
+            return ResponseDto.fail("관심상품이 없습니다.");
+
         List<MyPostDto> myPostDtoList = new ArrayList<>();
         for (WishList list : wishList) {
             myPostDtoList.add(
@@ -155,20 +156,18 @@ public class MyPageService {
 
     private ResponseDto<?> validateCheck(HttpServletRequest request) {
 
-        // RefreshToken 유효성 검사
-        if (null == request.getHeader("RefreshToken")) {
-            return ResponseDto.fail("연관 조회 오류");
-        }
-        // Authorization 유효성 검사
-        if (null == request.getHeader("Authorization")) {
-            return ResponseDto.fail("연관 조회 오류");
+        // RefreshToken 및 Authorization 유효성 검사
+        if (null == request.getHeader("RefreshToken") || null == request.getHeader("Authorization")) {
+            return ResponseDto.fail("로그인이 필요합니다.");
+
         }
 
         Member member = validateMember(request);
 
         // token 정보 유효성 검사
         if (null == member) {
-            return ResponseDto.fail("연관 조회 오류");
+            return ResponseDto.fail("Token이 유효하지 않습니다.");
+
         }
         return ResponseDto.success(member);
     }
