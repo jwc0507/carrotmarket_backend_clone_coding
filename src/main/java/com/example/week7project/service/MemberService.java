@@ -82,6 +82,8 @@ public class MemberService {
     // 로그아웃
     @Transactional
     public ResponseDto<?> logout(HttpServletRequest request) {
+        System.out.println("service : " + request.getHeader("RefreshToken"));
+
         if(!tokenProvider.validateToken(request.getHeader("RefreshToken")))
             return ResponseDto.fail("토큰 값이 올바르지 않습니다.");
 
