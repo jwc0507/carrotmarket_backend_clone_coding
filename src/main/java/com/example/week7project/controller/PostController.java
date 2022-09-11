@@ -29,12 +29,12 @@ public class PostController {
     }
     //게시글 작성
     @PostMapping("/api/post")
-    public ResponseDto<String> writePost(@RequestBody PostRequestDto postRequestDto) throws Exception {
+    public ResponseDto<Post> writePost(@RequestBody PostRequestDto postRequestDto) throws Exception {
         return postService.writePost(postRequestDto);
     }
     //게시글 수정
     @PutMapping("api/post/{id}")
-    public ResponseDto<String> modifyPost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
+    public ResponseDto<Post> modifyPost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
         return postService.updatePost(id, requestDto);
     }
     //게시글 삭제
