@@ -1,6 +1,7 @@
 package com.example.week7project.domain;
 
 import com.example.week7project.domain.enums.Authority;
+import com.example.week7project.dto.request.UpdateProfileDto;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -45,5 +46,11 @@ public class Member extends Timestamped{
 
     public boolean validatePassword(PasswordEncoder passwordEncoder, String password) {
         return passwordEncoder.matches(password, this.password);
+    }
+
+    //== 멤버 업데이트 메서드 ==//
+    public void updateMember(UpdateProfileDto updateProfileDto) {
+        this.nickname = updateProfileDto.getNickname();
+        this.address = updateProfileDto.getAddress();
     }
 }

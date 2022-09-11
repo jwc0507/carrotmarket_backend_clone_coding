@@ -19,20 +19,22 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class MyPageService {
 
-    private TokenProvider tokenProvider;
-    private MemberRepository memberRepository;
-    private PostRepository postRepository;
-    private PurchaseListRepository purchaseListRepository;
-    private WishListRepository wishListRepository;
+    private final TokenProvider tokenProvider;
+    private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
+    private final PurchaseListRepository purchaseListRepository;
+    private final WishListRepository wishListRepository;
 
     /**
      * 멤버 프로필 수정
      */
+    @Transactional
     public ResponseDto<?> updateProfile(UpdateProfileDto updateProfileDto, HttpServletRequest request) {
 
         //== token 유효성 검사 ==//
@@ -43,14 +45,14 @@ public class MyPageService {
 
         Member member = (Member) chkResponse.getData();
 
-        // 객체 DB에서 가져오기.
-        member.builder()
-                .phoneNumber(member.getPhoneNumber())
-                .nickname(updateProfileDto.getNickName())
-                .address(updateProfileDto.getAddress())
-                .temperature(member.getTemperature());
-        memberRepository.save(member);
-        return ResponseDto.success(member.getNickname() + "수정완료");
+        Optional<Member> findMember = memberRepository.findByPhoneNumber(member.getPhoneNumber());
+
+        if (findMember.isEmpty())
+            return ResponseDto.fail("회원이 존재하지 않습니다.");
+
+        // Member 객체 업데이트
+        findMember.get().updateMember(updateProfileDto);
+        return ResponseDto.success(findMember.get().getNickname() + " 수정완료");
     }
 
     /**
