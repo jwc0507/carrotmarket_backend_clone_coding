@@ -14,44 +14,32 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 public class PostController {
-
-    private final PostRepository postRepository;
     private final PostService postService;
 
     //게시글 전체 조회
     @GetMapping("api/view/post")
-    public ResponseDto<List<Post>> getPosts() {
-        List<Post> postList = postRepository.findAll();
-        return ResponseDto.success(postList);
+    public ResponseDto<List<Post>> readAllPosts() {
+        return postService.readAllPosts();
     }
     //게시글 조회.
-
     @GetMapping("api/view/post/{id}")
-    public ResponseDto<Post> getPost(@PathVariable Long id) {
-        //Optional<Post> post = postRepository.findById(id);
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("해당 아이디가 존재하지 않습니다.")
-        );
-        return ResponseDto.success(post);
-    }
+    public ResponseDto<Post> readPost(@PathVariable Long id) {
 
+        return postService.readPost(id);
+    }
     //게시글 작성
     @PostMapping("/api/post")
     public ResponseDto<String> writePost(@RequestBody PostRequestDto postRequestDto) throws Exception {
-        Post post = new Post(postRequestDto);
-        return ResponseDto.success("글 작성 완료");
-
+        return postService.writePost(postRequestDto);
     }
-
     //게시글 수정
     @PutMapping("api/post/{id}")
     public ResponseDto<String> modifyPost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
-        return postService.update(id, requestDto);
+        return postService.updatePost(id, requestDto);
     }
-
+    //게시글 삭제
     @DeleteMapping("api/post/{id}")
     public ResponseDto<String> deletePost(@PathVariable Long id) {
-        postRepository.deleteById(id);
-        return ResponseDto.success("글 삭제 완료");
+        return postService.deletePost(id);
     }
 }
