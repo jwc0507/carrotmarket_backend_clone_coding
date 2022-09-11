@@ -28,6 +28,7 @@ out/
 application-aws.properties
 memberTest.http
 socketTest.http
+postTest.http
 
 ### NetBeans ###
 /nbproject/private/
