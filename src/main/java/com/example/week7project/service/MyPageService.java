@@ -67,21 +67,13 @@ public class MyPageService {
     public ResponseDto<?> getSellPost(HttpServletRequest request) {
 
         //== token 유효성 검사 ==//
-        // RefreshToken 유효성 검사
-        if (null == request.getHeader("RefreshToken")) {
-            return ResponseDto.fail("연관 조회 오류");
-        }
-        // Authorization 유효성 검사
-        if (null == request.getHeader("Authorization")) {
-            return ResponseDto.fail("연관 조회 오류");
-        }
+        ResponseDto<?> chkResponse = validateCheck(request);
 
-        Member member = validateMember(request);
+        if(!chkResponse.isSuccess())
+            return chkResponse;
 
-        // token 정보 유효성 검사
-        if (null == member) {
-            return ResponseDto.fail("연관 조회 오류");
-        }
+        Member member = (Member) chkResponse.getData();
+
         List<Post> sellList = postRepository.findByMemberId(member.getId());
         List<MyPostDto> myPostDtoList = new ArrayList<>();
         for (Post post : sellList) {
@@ -102,21 +94,13 @@ public class MyPageService {
     public ResponseDto<?> getPurchasePost(HttpServletRequest request) {
 
         //== token 유효성 검사 ==//
-        // RefreshToken 유효성 검사
-        if (null == request.getHeader("RefreshToken")) {
-            return ResponseDto.fail("연관 조회 오류");
-        }
-        // Authorization 유효성 검사
-        if (null == request.getHeader("Authorization")) {
-            return ResponseDto.fail("연관 조회 오류");
-        }
+        ResponseDto<?> chkResponse = validateCheck(request);
 
-        Member member = validateMember(request);
+        if(!chkResponse.isSuccess())
+            return chkResponse;
 
-        // token 정보 유효성 검사
-        if (null == member) {
-            return ResponseDto.fail("연관 조회 오류");
-        }
+        Member member = (Member) chkResponse.getData();
+
         List<PurchaseList> purchaseList = purchaseListRepository.findByMemberId(member.getId());
         List<MyPostDto> myPostDtoList = new ArrayList<>();
         for (PurchaseList list : purchaseList) {
@@ -137,21 +121,12 @@ public class MyPageService {
      */
     public ResponseDto<?> getWishPost(HttpServletRequest request) {
         //== token 유효성 검사 ==//
-        // RefreshToken 유효성 검사
-        if (null == request.getHeader("RefreshToken")) {
-            return ResponseDto.fail("연관 조회 오류");
-        }
-        // Authorization 유효성 검사
-        if (null == request.getHeader("Authorization")) {
-            return ResponseDto.fail("연관 조회 오류");
-        }
+        ResponseDto<?> chkResponse = validateCheck(request);
 
-        Member member = validateMember(request);
+        if(!chkResponse.isSuccess())
+            return chkResponse;
 
-        // token 정보 유효성 검사
-        if (null == member) {
-            return ResponseDto.fail("연관 조회 오류");
-        }
+        Member member = (Member) chkResponse.getData();
 
         List<WishList> wishList = wishListRepository.findByMemberId(member.getId());
         List<MyPostDto> myPostDtoList = new ArrayList<>();
@@ -176,6 +151,26 @@ public class MyPageService {
             return null;
         }
         return tokenProvider.getMemberFromAuthentication();
+    }
+
+    private ResponseDto<?> validateCheck(HttpServletRequest request) {
+
+        // RefreshToken 유효성 검사
+        if (null == request.getHeader("RefreshToken")) {
+            return ResponseDto.fail("연관 조회 오류");
+        }
+        // Authorization 유효성 검사
+        if (null == request.getHeader("Authorization")) {
+            return ResponseDto.fail("연관 조회 오류");
+        }
+
+        Member member = validateMember(request);
+
+        // token 정보 유효성 검사
+        if (null == member) {
+            return ResponseDto.fail("연관 조회 오류");
+        }
+        return ResponseDto.success(member);
     }
 
 
