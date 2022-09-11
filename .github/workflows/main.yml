@@ -5,7 +5,7 @@ on:
     branches: [ "master" ]
     
 env:
-  S3_BUCKET_NAME: w7carrot-depoly
+  S3_BUCKET_NAME: w7carrot-deploy
   CODE_DEPLOY_APPLICATION_NAME: 7w2t
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: 7w2t-group
   AWS_REGION: ap-northeast-2
