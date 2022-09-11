@@ -7,6 +7,7 @@ import com.example.week7project.domain.WishList;
 import com.example.week7project.dto.request.UpdateProfileDto;
 import com.example.week7project.dto.response.MyPostDto;
 import com.example.week7project.dto.response.ResponseDto;
+import com.example.week7project.repository.MemberRepository;
 import com.example.week7project.repository.PostRepository;
 import com.example.week7project.repository.PurchaseListRepository;
 import com.example.week7project.repository.WishListRepository;
@@ -41,11 +42,11 @@ public class MyPageService {
         // 객체 DB에서 가져오기.
         member.builder()
                 .phoneNumber(member.getPhoneNumber())
-                .nickName(updateProfileDto.getNickName())
+                .nickname(updateProfileDto.getNickName())
                 .address(updateProfileDto.getAddress())
                 .temperature(member.getTemperature());
         memberRepository.save(member);          //== 추후 얘기 후 변경 예정 ==// ==> Entity 에 update기능을 넣을 것인지?
-        return ResponseDto.success(member.getNickName() + "수정완료");
+        return ResponseDto.success(member.getNickname() + "수정완료");
     }
 
     /**
