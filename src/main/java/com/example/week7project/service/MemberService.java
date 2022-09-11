@@ -39,8 +39,14 @@ public class MemberService {
         // blank 인지 확인 .isBlank()로도 가능함.
         if(phoneNumber.trim().isEmpty() || nickName.trim().isEmpty() || password.trim().isEmpty())
             return ResponseDto.fail("빈칸을 채워 다시 입력해주세요.");
-        // 아이디 닉네임 중복확인
-
+        // 전화번호 닉네임 중복확인
+        DuplicationRequestDto duplicationRequestDto = new DuplicationRequestDto();
+        duplicationRequestDto.setValue(requestDto.getNickname());
+        if (!checkNickname(duplicationRequestDto).isSuccess())
+            return ResponseDto.fail("닉네임 중복검사를 다시 해주세요.");
+        duplicationRequestDto.setValue(requestDto.getPhoneNumber());
+        if(!checkPhoneNumber(duplicationRequestDto).isSuccess())
+            return ResponseDto.fail("전화번호 중복검사를 다시 해주세요.");
 
         Member newMember = Member.builder()
                 .phoneNumber(phoneNumber)

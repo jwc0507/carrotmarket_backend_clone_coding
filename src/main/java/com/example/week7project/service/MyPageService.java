@@ -159,6 +159,7 @@ public class MyPageService {
         // RefreshToken 및 Authorization 유효성 검사
         if (null == request.getHeader("RefreshToken") || null == request.getHeader("Authorization")) {
             return ResponseDto.fail("로그인이 필요합니다.");
+
         }
 
         Member member = validateMember(request);
@@ -166,6 +167,7 @@ public class MyPageService {
         // token 정보 유효성 검사
         if (null == member) {
             return ResponseDto.fail("Token이 유효하지 않습니다.");
+
         }
         return ResponseDto.success(member);
     }
