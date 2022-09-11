@@ -19,34 +19,40 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class MyPageService {
 
-    private TokenProvider tokenProvider;
-    private MemberRepository memberRepository;
-    private PostRepository postRepository;
-    private PurchaseListRepository purchaseListRepository;
-    private WishListRepository wishListRepository;
+    private final TokenProvider tokenProvider;
+    private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
+    private final PurchaseListRepository purchaseListRepository;
+    private final WishListRepository wishListRepository;
 
     /**
      * 멤버 프로필 수정
      */
+    @Transactional
     public ResponseDto<?> updateProfile(UpdateProfileDto updateProfileDto, HttpServletRequest request) {
 
-        // 토큰 유효성 검사 로직 추가하기
+        //== token 유효성 검사 ==//
+        ResponseDto<?> chkResponse = validateCheck(request);
 
+        if(!chkResponse.isSuccess())
+            return chkResponse;
 
-        Member member = validateMember(request);
-        // 객체 DB에서 가져오기.
-        member.builder()
-                .phoneNumber(member.getPhoneNumber())
-                .nickname(updateProfileDto.getNickName())
-                .address(updateProfileDto.getAddress())
-                .temperature(member.getTemperature());
-        memberRepository.save(member);          //== 추후 얘기 후 변경 예정 ==// ==> Entity 에 update기능을 넣을 것인지?
-        return ResponseDto.success(member.getNickname() + "수정완료");
+        Member member = (Member) chkResponse.getData();
+
+        Optional<Member> findMember = memberRepository.findByPhoneNumber(member.getPhoneNumber());
+
+        if (findMember.isEmpty())
+            return ResponseDto.fail("회원이 존재하지 않습니다.");
+
+        // Member 객체 업데이트
+        findMember.get().updateMember(updateProfileDto);
+        return ResponseDto.success(findMember.get().getNickname() + " 수정완료");
     }
 
     /**
@@ -54,11 +60,18 @@ public class MyPageService {
      */
     public ResponseDto<?> getSellPost(HttpServletRequest request) {
 
-        // 토큰 유효성 검사 로직 추가하기
+        //== token 유효성 검사 ==//
+        ResponseDto<?> chkResponse = validateCheck(request);
 
+        if(!chkResponse.isSuccess())
+            return chkResponse;
 
-        Member member = validateMember(request);
+        Member member = (Member) chkResponse.getData();
+
         List<Post> sellList = postRepository.findByMemberId(member.getId());
+        if (sellList.isEmpty())
+            return ResponseDto.fail("판매한 내역이 없습니다.");
+
         List<MyPostDto> myPostDtoList = new ArrayList<>();
         for (Post post : sellList) {
             myPostDtoList.add(
@@ -77,10 +90,18 @@ public class MyPageService {
      */
     public ResponseDto<?> getPurchasePost(HttpServletRequest request) {
 
-        // 토큰 유효성 검사 로직 추가하기
+        //== token 유효성 검사 ==//
+        ResponseDto<?> chkResponse = validateCheck(request);
 
-        Member member = validateMember(request);
+        if(!chkResponse.isSuccess())
+            return chkResponse;
+
+        Member member = (Member) chkResponse.getData();
+
         List<PurchaseList> purchaseList = purchaseListRepository.findByMemberId(member.getId());
+        if (purchaseList.isEmpty())
+            return ResponseDto.fail("구매한 내역이 없습니다.");
+
         List<MyPostDto> myPostDtoList = new ArrayList<>();
         for (PurchaseList list : purchaseList) {
             myPostDtoList.add(
@@ -99,9 +120,18 @@ public class MyPageService {
      * 관심상품 목록조회
      */
     public ResponseDto<?> getWishPost(HttpServletRequest request) {
-        Member member = validateMember(request);
+        //== token 유효성 검사 ==//
+        ResponseDto<?> chkResponse = validateCheck(request);
+
+        if(!chkResponse.isSuccess())
+            return chkResponse;
+
+        Member member = (Member) chkResponse.getData();
 
         List<WishList> wishList = wishListRepository.findByMemberId(member.getId());
+        if (wishList.isEmpty())
+            return ResponseDto.fail("관심상품이 없습니다.");
+
         List<MyPostDto> myPostDtoList = new ArrayList<>();
         for (WishList list : wishList) {
             myPostDtoList.add(
@@ -124,6 +154,24 @@ public class MyPageService {
             return null;
         }
         return tokenProvider.getMemberFromAuthentication();
+    }
+
+    private ResponseDto<?> validateCheck(HttpServletRequest request) {
+
+        // RefreshToken 및 Authorization 유효성 검사
+        if (null == request.getHeader("RefreshToken") || null == request.getHeader("Authorization")) {
+            return ResponseDto.fail("로그인이 필요합니다.");
+
+        }
+
+        Member member = validateMember(request);
+
+        // token 정보 유효성 검사
+        if (null == member) {
+            return ResponseDto.fail("Token이 유효하지 않습니다.");
+
+        }
+        return ResponseDto.success(member);
     }
 
 

@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class UpdateProfileDto {
-    private String nickName;
+    private String nickname;
     private String address;
 }

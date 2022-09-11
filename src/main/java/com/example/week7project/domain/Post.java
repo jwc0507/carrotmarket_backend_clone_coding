@@ -1,5 +1,6 @@
 package com.example.week7project.domain;
 
+import com.example.week7project.dto.request.PostRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -40,9 +41,18 @@ public class Post extends Timestamped{
     @Column
     private int numOfWish;
 
+    //Question create_at은 멤버 정의 안 해줘도 되나?
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    public void updatePost(PostRequestDto postRequestDto) {
+        this.title = postRequestDto.getTitle();
+        this.category = postRequestDto.getCategory();
+        this.imageUrl = postRequestDto.getImageUrl();
+        this.price = postRequestDto.getPrice();
+        this.content = postRequestDto.getContent();
+    }
 
     public boolean validateMember(Member member) {
         return !this.member.equals(member);
