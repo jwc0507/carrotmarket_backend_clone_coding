@@ -1,5 +1,6 @@
 package com.example.week7project.domain;
 
+import com.example.week7project.dto.request.PostRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -43,6 +44,33 @@ public class Post extends Timestamped{
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    public Post(PostRequestDto postRequestDto)
+    {
+        this.title = postRequestDto.getTitle();
+        this.status = postRequestDto.getStatus();
+        this.category = postRequestDto.getCategory();
+        this.imageUrl = postRequestDto.getImageUrl();
+        this.price = postRequestDto.getPrice();
+        this.content = postRequestDto.getContent();
+        this.numOfChat = postRequestDto.getNumOfChat();
+        this.numOfWish= postRequestDto.getNumOfWish();
+        this.member = postRequestDto.getMember();
+    }
+
+    public void update(PostRequestDto postRequestDto) {
+        this.title = postRequestDto.getTitle();
+        this.status = postRequestDto.getStatus();
+        this.category = postRequestDto.getCategory();
+        this.imageUrl = postRequestDto.getImageUrl();
+        this.price = postRequestDto.getPrice();
+        this.content = postRequestDto.getContent();
+        this.numOfChat = postRequestDto.getNumOfChat();
+        this.numOfWish= postRequestDto.getNumOfWish();
+        this.member = postRequestDto.getMember();
+    }
+
+
 
     public boolean validateMember(Member member) {
         return !this.member.equals(member);
