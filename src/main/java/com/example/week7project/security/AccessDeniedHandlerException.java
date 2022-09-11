@@ -19,7 +19,7 @@ public class AccessDeniedHandlerException implements AccessDeniedHandler {
     response.setContentType("application/json;charset=UTF-8");
     response.getWriter().println(
             new ObjectMapper().writeValueAsString(
-                    ResponseDto.fail("BAD_REQUEST_AC", "로그인이 필요합니다!")
+                    ResponseDto.fail("접근거부: 로그인이 필요합니다!")
             )
     );
     response.setStatus(HttpServletResponse.SC_FORBIDDEN);

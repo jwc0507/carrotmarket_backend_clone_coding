@@ -35,10 +35,11 @@ public class MemberService {
 
         // null 인지 확인
         if(phoneNumber==null || nickName==null || password==null)
-            return ResponseDto.fail("NULL_ERRER", "입력필드가 잘못되었습니다.");
+            return ResponseDto.fail("입력필드가 잘못되었습니다.");
         // blank 인지 확인 .isBlank()로도 가능함.
         if(phoneNumber.trim().isEmpty() || nickName.trim().isEmpty() || password.trim().isEmpty())
-            return ResponseDto.fail("BLANK_ERROR", "빈칸을 채워 다시 입력해주세요.");
+            return ResponseDto.fail("빈칸을 채워 다시 입력해주세요.");
+        // 아이디 닉네임 중복확인
 
 
         Member newMember = Member.builder()
@@ -58,10 +59,10 @@ public class MemberService {
     public ResponseDto<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
         Member member = isPresentMember(requestDto.getPhoneNumber());
         if(member==null){
-            return ResponseDto.fail("Not Found Member","존재하지 않는 전화번호입니다.");
+            return ResponseDto.fail("존재하지 않는 전화번호입니다.");
         }
         if (!member.validatePassword(passwordEncoder, requestDto.getPassword())) {
-            return ResponseDto.fail("INVALID_MEMBER", "잘못된 비밀번호 입니다.");
+            return ResponseDto.fail("잘못된 비밀번호 입니다.");
         }
 
         // 토큰 생성
@@ -76,12 +77,12 @@ public class MemberService {
     @Transactional
     public ResponseDto<?> logout(HttpServletRequest request) {
         if(!tokenProvider.validateToken(request.getHeader("RefreshToken")))
-            return ResponseDto.fail("INVAILD_TOKEN", "토큰 값이 올바르지 않습니다.");
+            return ResponseDto.fail("토큰 값이 올바르지 않습니다.");
 
         // 맴버객체 찾아오기
         Member member = tokenProvider.getMemberFromAuthentication();
         if (null == member)
-            return ResponseDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
+            return ResponseDto.fail("사용자를 찾을 수 없습니다.");
         tokenProvider.deleteRefreshToken(member);
 
 
@@ -92,7 +93,7 @@ public class MemberService {
     public ResponseDto<?> checkPhoneNumber(DuplicationRequestDto requestDto) {
         Optional<Member> optionalMember = memberRepository.findByPhoneNumber(requestDto.getValue());
         if (optionalMember.isPresent())
-            return ResponseDto.success("중복된 전화번호 입니다.");
+            return ResponseDto.fail("중복된 전화번호 입니다.");
         return ResponseDto.success("사용 가능한 전화번호 입니다.");
     }
 
@@ -100,7 +101,7 @@ public class MemberService {
     public ResponseDto<?> checkNickname(DuplicationRequestDto requestDto) {
         Optional<Member> optionalMember = memberRepository.findByNickname(requestDto.getValue());
         if (optionalMember.isPresent())
-            return ResponseDto.success("중복된 닉네임 입니다.");
+            return ResponseDto.fail("중복된 닉네임 입니다.");
         return ResponseDto.success("사용 가능한 닉네임 입니다.");
     }
 
