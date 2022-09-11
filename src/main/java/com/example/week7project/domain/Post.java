@@ -43,4 +43,8 @@ public class Post extends Timestamped{
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    public boolean validateMember(Member member) {
+        return !this.member.equals(member);
+    }
 }
