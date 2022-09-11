@@ -41,6 +41,7 @@ public class Post extends Timestamped{
     @Column
     private int numOfWish;
 
+    //Question create_at은 멤버 정의 안 해줘도 되나?
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;

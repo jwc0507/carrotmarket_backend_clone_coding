@@ -2,6 +2,8 @@ package com.example.week7project.controller;
 
 import com.example.week7project.domain.Post;
 import com.example.week7project.dto.request.PostRequestDto;
+import com.example.week7project.dto.response.PostListResponseDto;
+import com.example.week7project.dto.response.PostResponseDto;
 import com.example.week7project.dto.response.ResponseDto;
 import com.example.week7project.repository.PostRepository;
 import com.example.week7project.service.PostService;
@@ -18,23 +20,23 @@ public class PostController {
 
     //게시글 전체 조회
     @GetMapping("api/view/post")
-    public ResponseDto<List<Post>> readAllPosts() {
+    public ResponseDto<List<PostListResponseDto>> readAllPosts() {
         return postService.readAllPosts();
     }
     //게시글 조회.
     @GetMapping("api/view/post/{id}")
-    public ResponseDto<Post> readPost(@PathVariable Long id) {
+    public ResponseDto<PostResponseDto> readPost(@PathVariable Long id) {
 
         return postService.readPost(id);
     }
     //게시글 작성
     @PostMapping("/api/post")
-    public ResponseDto<Post> writePost(@RequestBody PostRequestDto postRequestDto) throws Exception {
+    public ResponseDto<PostResponseDto> writePost(@RequestBody PostRequestDto postRequestDto) throws Exception {
         return postService.writePost(postRequestDto);
     }
     //게시글 수정
     @PutMapping("api/post/{id}")
-    public ResponseDto<Post> modifyPost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
+    public ResponseDto<PostResponseDto> modifyPost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
         return postService.updatePost(id, requestDto);
     }
     //게시글 삭제
