@@ -5,6 +5,7 @@ import com.example.week7project.domain.Post;
 import com.example.week7project.domain.PurchaseList;
 import com.example.week7project.domain.WishList;
 import com.example.week7project.dto.request.UpdateProfileDto;
+import com.example.week7project.dto.response.MemberProfileDto;
 import com.example.week7project.dto.response.MyPostDto;
 import com.example.week7project.dto.response.ResponseDto;
 import com.example.week7project.repository.MemberRepository;
@@ -136,7 +137,7 @@ public class MyPageService {
         for (WishList list : wishList) {
             myPostDtoList.add(
                     MyPostDto.builder()
-                            .id(list.getId())
+                            .id(list.getPost().getId())
                             .title(list.getPost().getTitle())
                             .imgUrl(list.getPost().getImageUrl())
                             .price(list.getPost().getPrice())
@@ -144,6 +145,38 @@ public class MyPageService {
             );
         }
         return ResponseDto.success(myPostDtoList);
+    }
+
+    /**
+     * 멤버 정보 가져오기
+     */
+    public ResponseDto<?> getMemberProfile(HttpServletRequest request) {
+        //== token 유효성 검사 ==//
+        ResponseDto<?> chkResponse = validateCheck(request);
+
+        if(!chkResponse.isSuccess())
+            return chkResponse;
+
+        Member member = (Member) chkResponse.getData();
+        Optional<Member> repositoryMember = memberRepository.findByPhoneNumber(member.getPhoneNumber());
+
+        List<Post> sellPost = postRepository.findByMemberId(repositoryMember.get().getId());
+        int numOfSale = 0;
+        for (Post post : sellPost) {
+            // == status 관련 코드 합친 후 재수정 예정 ==//
+            if (post.getStatus().equals("판매중")) {
+                numOfSale++;
+            }
+        }
+
+        return ResponseDto.success(
+                MemberProfileDto.builder()
+                        .nickname(repositoryMember.get().getNickname())
+                        .id(repositoryMember.get().getId())
+                        .temperature(repositoryMember.get().getTemperature())
+                        .numOfSale(numOfSale)
+                        .build()
+        );
     }
 
 

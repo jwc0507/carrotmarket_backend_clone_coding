@@ -4,6 +4,8 @@ import com.example.week7project.domain.Member;
 import com.example.week7project.domain.Post;
 import com.example.week7project.domain.enums.Category;
 import com.example.week7project.dto.request.PostRequestDto;
+import com.example.week7project.dto.request.StatusRequestDto;
+import com.example.week7project.dto.response.MyPostDto;
 import com.example.week7project.dto.response.PostResponseDto;
 import com.example.week7project.dto.response.PostListResponseDto;
 import com.example.week7project.dto.response.ResponseDto;
@@ -227,5 +229,75 @@ public class PostService {
             return null;
         }
         return tokenProvider.getMemberFromAuthentication();
+    }
+
+
+    // 연관 카테고리 상품목록 조회
+    public ResponseDto<?> getCategoryList(Long postId) {
+        Post post = isPresentPost(postId);
+        List<MyPostDto> postDtoList = new ArrayList<>();
+        if (null == post)
+            return ResponseDto.success(postDtoList);    // 연관카테고리 글 없으면 그냥 빈 리스트 주면됨
+
+        Category getCategory = post.getCategory();
+
+        List<Post> posts = postRepository.findByCategory(getCategory);
+
+        for (int i = 0, n = posts.size(); i < n && i < 4; i++) {
+            Post p = posts.get(i);
+            MyPostDto myPostDto = MyPostDto.builder()
+                    .id(p.getId())
+                    .title(p.getTitle())
+                    .imgUrl(p.getImageUrl())
+                    .price(p.getPrice())
+                    .build();
+            postDtoList.add(myPostDto);
+
+        }
+
+        return ResponseDto.success(postDtoList);
+    }
+
+    // 판매자 상품 목록 조회
+    public ResponseDto<?> getProductList(Long sellerId) {
+        List<Post> posts = postRepository.findByMemberId(sellerId);
+        List<MyPostDto> postDtoList = new ArrayList<>();
+
+        for (int i = 0, n = posts.size(); i < n && i < 10; i++) {
+            Post p = posts.get(i);
+            MyPostDto myPostDto = MyPostDto.builder()
+                    .id(p.getId())
+                    .title(p.getTitle())
+                    .imgUrl(p.getImageUrl())
+                    .price(p.getPrice())
+                    .build();
+            postDtoList.add(myPostDto);
+
+        }
+        return ResponseDto.success(postDtoList);
+    }
+
+
+    // 상품 상태 변경 (안쓸 예졍)
+    @Transactional
+    public ResponseDto<?> switchStatus(Long id, StatusRequestDto statusRequestDto, HttpServletRequest request) {
+        ResponseDto<?> chkResponse = validateCheck(request);
+        if (!chkResponse.isSuccess())
+            return chkResponse;
+        Member member = (Member) chkResponse.getData();
+        // 유저 테이블에서 유저객체 가져오기
+        Member updateMember = memberRepository.findByNickname(member.getNickname()).get();
+
+        Post post = isPresentPost(id);
+        if (null == post) {
+            return ResponseDto.fail("글 조회 오류 (NOT_EXIST)");
+        }
+        // 작성자 검증
+        if (post.validateMember(updateMember))
+            return ResponseDto.fail("작성자가 아닙니다.");
+
+        post.changeStatus(statusRequestDto);
+
+        return ResponseDto.success(post.getStatus());
     }
 }
