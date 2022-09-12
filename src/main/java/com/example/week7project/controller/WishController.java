@@ -18,19 +18,19 @@ public class WishController {
     private final WishService wishService;
 
     //관심상품 누르기
-    @PostMapping("/api/addwhishlist/{id}")
+    @PostMapping("/api/addwishlist/{id}")
     public ResponseDto<?> addWhishPost(@PathVariable Long id, HttpServletRequest request) {
         return wishService.addWishPost(id, request);
     }
 
     // 관심상품 누르기 취소
-    @PostMapping("/api/removewhishlist/{id}")
+    @PostMapping("/api/removewishlist/{id}")
     public ResponseDto<?> removeWhishPost(@PathVariable Long id, HttpServletRequest request) {
         return wishService.removeWishPost(id, request);
     }
 
     // 관심상품 확인
-    @GetMapping("/api/getwhishlist/{id}")
+    @GetMapping("/api/getwishlist/{id}")
     public ResponseDto<?> checkStatus(@PathVariable Long id, HttpServletRequest request) {
         return wishService.checkStatus(id, request);
     }

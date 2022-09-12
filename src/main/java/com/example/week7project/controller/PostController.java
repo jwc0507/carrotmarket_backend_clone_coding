@@ -50,6 +50,15 @@ public class PostController {
         return postService.getCategoryList(id);
     }
 
+
+    // 판매자등록 상품 검색
+    @RequestMapping (value = "/api/view/sellerproduct/{id}", method = RequestMethod.GET)
+    public ResponseDto<?> getSellerProduct(@PathVariable Long id) {
+        return postService.getProductList(id);
+    }
+
+
+
     // 판매글 상태변경 (구현중단)
     @RequestMapping (value = "/api/post/status/{id}", method = RequestMethod.PUT)
     public ResponseDto<?> switchStatus(@PathVariable Long id, @RequestBody StatusRequestDto statusRequestDto, HttpServletRequest request) {
