@@ -43,4 +43,9 @@ public class MypageController {
         return myPageService.getWishPost(request);
     }
 
+    // 회원 정보 조회
+    @GetMapping("/api/user")
+    public ResponseDto<?> getMemberProfile(HttpServletRequest request) {
+        return myPageService.getMemberProfile(request);
+    }
 }
