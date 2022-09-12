@@ -1,6 +1,7 @@
 package com.example.week7project.controller;
 
 import com.example.week7project.dto.request.PostRequestDto;
+import com.example.week7project.dto.request.StatusRequestDto;
 import com.example.week7project.dto.response.ResponseDto;
 import com.example.week7project.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +42,17 @@ public class PostController {
     @DeleteMapping("/api/post/{id}")
     public ResponseDto<?> deletePost(@PathVariable Long id, HttpServletRequest request) {
         return postService.deletePost(id, request);
+    }
+
+    // 연관상품 검색
+    @RequestMapping (value = "/api/view/categorylist/{id}", method = RequestMethod.GET)
+    public ResponseDto<?> getCategoryList(@PathVariable Long id) {
+        return postService.getCategoryList(id);
+    }
+
+    // 판매글 상태변경 (구현중단)
+    @RequestMapping (value = "/api/post/status/{id}", method = RequestMethod.PUT)
+    public ResponseDto<?> switchStatus(@PathVariable Long id, @RequestBody StatusRequestDto statusRequestDto, HttpServletRequest request) {
+        return postService.switchStatus(id, statusRequestDto, request);
     }
 }
