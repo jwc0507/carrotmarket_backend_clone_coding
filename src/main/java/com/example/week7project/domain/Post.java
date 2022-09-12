@@ -1,5 +1,6 @@
 package com.example.week7project.domain;
 
+import com.example.week7project.domain.enums.Category;
 import com.example.week7project.dto.request.PostRequestDto;
 import lombok.*;
 
@@ -24,7 +25,8 @@ public class Post extends Timestamped{
     private String status;
 
     @Column (nullable = false)
-    private String category;
+    @Enumerated (EnumType.STRING)
+    private Category category;
 
     @Column
     private String imageUrl;
@@ -48,7 +50,7 @@ public class Post extends Timestamped{
 
     public void updatePost(PostRequestDto postRequestDto) {
         this.title = postRequestDto.getTitle();
-        this.category = postRequestDto.getCategory();
+        this.category = Category.valueOf(postRequestDto.getCategory());
         this.imageUrl = postRequestDto.getImageUrl();
         this.price = postRequestDto.getPrice();
         this.content = postRequestDto.getContent();
