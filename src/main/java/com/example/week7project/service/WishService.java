@@ -45,6 +45,7 @@ public class WishService {
                 .build();
 
         wishListRepository.save(wishList);
+        post.get().addWish();
         return ResponseDto.success("관심상품 추가가 완료되었습니다.");
     }
 
@@ -63,6 +64,7 @@ public class WishService {
             return ResponseDto.fail("아직 관심상품에 등록되지 않았습니다.");
         }
         wishListRepository.delete(wishList);
+        post.get().removeWish();
         return ResponseDto.success("관심상품 취소가 완료되었습니다.");
     }
 

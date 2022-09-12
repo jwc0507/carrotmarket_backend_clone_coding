@@ -164,7 +164,7 @@ public class MyPageService {
         int numOfSale = 0;
         for (Post post : sellPost) {
             // == status 관련 코드 합친 후 재수정 예정 ==//
-            if (post.getStatus() == "판매중") {
+            if (post.getStatus().equals("판매중")) {
                 numOfSale++;
             }
         }
