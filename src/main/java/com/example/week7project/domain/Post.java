@@ -77,4 +77,8 @@ public class Post extends Timestamped{
         }
         this.numOfWish = tempWish;
     }
+
+    public void addChatCount() {
+        this.numOfChat++;
+    }
 }
