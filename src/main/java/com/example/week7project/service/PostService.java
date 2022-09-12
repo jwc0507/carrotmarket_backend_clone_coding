@@ -2,6 +2,7 @@ package com.example.week7project.service;
 
 import com.example.week7project.domain.Member;
 import com.example.week7project.domain.Post;
+import com.example.week7project.domain.enums.Category;
 import com.example.week7project.dto.request.PostRequestDto;
 import com.example.week7project.dto.response.PostResponseDto;
 import com.example.week7project.dto.response.PostListResponseDto;
@@ -66,7 +67,7 @@ public class PostService {
                         .temperature(member.getTemperature())
                         .title(post.getTitle())
                         .status(post.getStatus())
-                        .category(post.getCategory())
+                        .category(post.getCategory().toString())
                         .nickname(member.getNickname())
                         .address(member.getAddress())
                         .imgUrl(post.getImageUrl())
@@ -95,7 +96,7 @@ public class PostService {
                 .status("판매중")
                 .price(postRequestDto.getPrice())
                 .imageUrl(postRequestDto.getImageUrl())
-                .category(postRequestDto.getCategory())
+                .category(Category.valueOf(postRequestDto.getCategory()))
                 .content(postRequestDto.getContent())
                 .numOfChat(0)
                 .numOfWish(0)
@@ -163,7 +164,7 @@ public class PostService {
                         .temperature(updateMember.getTemperature())
                         .title(post.getTitle())
                         .status(post.getStatus())
-                        .category(post.getCategory())
+                        .category(post.getCategory().toString())
                         .nickname(updateMember.getNickname())
                         .address(updateMember.getAddress())
                         .imgUrl(post.getImageUrl())
