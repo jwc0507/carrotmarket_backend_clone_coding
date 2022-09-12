@@ -2,6 +2,7 @@ package com.example.week7project.domain;
 
 import com.example.week7project.domain.enums.Category;
 import com.example.week7project.dto.request.PostRequestDto;
+import com.example.week7project.dto.request.StatusRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -54,6 +55,10 @@ public class Post extends Timestamped{
         this.imageUrl = postRequestDto.getImageUrl();
         this.price = postRequestDto.getPrice();
         this.content = postRequestDto.getContent();
+    }
+
+    public void changeStatus(StatusRequestDto requestDto) {
+        this.status = requestDto.getStatus();
     }
 
     public boolean validateMember(Member member) {
