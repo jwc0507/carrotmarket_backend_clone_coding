@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+// 사용하지 않음 db수정을 해야해서 일단 남겨둠
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

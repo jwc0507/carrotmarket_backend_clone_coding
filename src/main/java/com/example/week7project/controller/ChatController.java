@@ -19,5 +19,9 @@ public class ChatController {
         return chatService.createRoom(id, requestDto, request);
     }
 
-    // 채팅방 조회
+    // 게시글 채팅방 조회
+    @RequestMapping (value = "/api/chat/{id}", method = RequestMethod.GET)
+    public ResponseDto<?> getChatRoomId(@PathVariable Long id, HttpServletRequest request) {
+        return chatService.getRoomId(id, request);
+    }
 }

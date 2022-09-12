@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
@@ -34,37 +33,29 @@ public class ChatService {
     @Transactional
     public ResponseDto<?> createRoom(Long postId, ChatRoomRequestDto requestDto, HttpServletRequest request) {
         ResponseDto<?> chkResponse = validateCheck(request);
-        if(!chkResponse.isSuccess())
+        if (!chkResponse.isSuccess())
             return ResponseDto.fail(chkResponse);
         Member member = validateMember(request);
-        if(member == null)
+        if (member == null)
             return ResponseDto.fail("사용자를 찾을 수 없습니다.");
-
         Optional<Post> getPost = postRepository.findById(postId);
-        if(getPost.isEmpty())
+        if (getPost.isEmpty())
             return ResponseDto.fail("게시글을 찾을 수 없습니다.");
-//        Post post = Post.builder()
-//                .title("뭐팝니다")
-//                .category("전자")
-//                .content("내용")
-//                .status("판매중")
-//                .price(10000)
-//                .member(member)
-//                .build();
-//        postRepository.save(post);
 
         ChatRoom chatRoom = ChatRoom.builder()
                 .name(requestDto.getRoomName())
                 .post(getPost.get())
-//                .post(post)
                 .member(member)
                 .build();
         chatRoomRepository.save(chatRoom);
+
+        getPost.get().addChatCount();
+
         return ResponseDto.success(chatRoom);
     }
 
     public <T> void sendMessage(WebSocketSession session, T message) {
-        try{
+        try {
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
         } catch (JsonProcessingException e) {
             log.error(e.getMessage(), e);
@@ -75,11 +66,11 @@ public class ChatService {
     }
 
     private ResponseDto<?> validateCheck(HttpServletRequest request) {
-        if(null == request.getHeader("RefreshToken") || null == request.getHeader("Authorization")) {
+        if (null == request.getHeader("RefreshToken") || null == request.getHeader("Authorization")) {
             return ResponseDto.fail("로그인이 필요합니다.");
         }
         Member member = validateMember(request);
-        if(null == member) {
+        if (null == member) {
             return ResponseDto.fail("Token이 유효하지 않습니다.");
         }
         return ResponseDto.success(member);
@@ -91,5 +82,25 @@ public class ChatService {
             return null;
         }
         return tokenProvider.getMemberFromAuthentication();
+    }
+
+    // 자신이 속한 게시글의 채팅방 번호 찾기.
+    public ResponseDto<?> getRoomId(Long postId, HttpServletRequest request) {
+        ResponseDto<?> chkResponse = validateCheck(request);
+        if (!chkResponse.isSuccess())
+            return ResponseDto.fail(chkResponse);
+        Member member = validateMember(request);
+        if (member == null)
+            return ResponseDto.fail("사용자를 찾을 수 없습니다.");
+
+        Optional<Post> getPost = postRepository.findById(postId);
+        if (getPost.isEmpty())
+            return ResponseDto.fail("게시글을 찾을 수 없습니다.");
+
+
+        ChatRoom chatRoom = chatRoomRepository.findByMemberAndPost(member, getPost.get());
+        if (chatRoom == null)
+            return ResponseDto.success(0);
+        return ResponseDto.success(chatRoom.getId());
     }
 }
