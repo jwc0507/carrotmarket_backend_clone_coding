@@ -33,7 +33,7 @@ public class MemberController {
     }
 
     // 로그아웃
-    @RequestMapping(value = "/api/logout", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/member/logout", method = RequestMethod.POST)
     public ResponseDto<?> logout(HttpServletRequest request) {
         return memberService.logout(request);
     }
