@@ -58,10 +58,15 @@ public class PostController {
     }
 
 
-
-    // 판매글 상태변경 (구현중단)
+    // 판매글 상태변경 (판매중, 예약중)
     @RequestMapping (value = "/api/post/status/{id}", method = RequestMethod.PUT)
     public ResponseDto<?> switchStatus(@PathVariable Long id, @RequestBody StatusRequestDto statusRequestDto, HttpServletRequest request) {
         return postService.switchStatus(id, statusRequestDto, request);
+    }
+
+    // 판매글 상태변경 (거래, 나눔완료)
+    @RequestMapping (value = "/api/post/status/done/{id}", method = RequestMethod.PUT)
+    public ResponseDto<?> switchStatusDone(@PathVariable Long id, @RequestBody StatusRequestDto statusRequestDto, HttpServletRequest request) {
+        return postService.switchStatusDone(id, statusRequestDto, request);
     }
 }
