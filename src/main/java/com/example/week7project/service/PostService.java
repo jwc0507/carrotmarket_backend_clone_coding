@@ -1,7 +1,9 @@
 package com.example.week7project.service;
 
+import com.example.week7project.domain.ChatRoom;
 import com.example.week7project.domain.Member;
 import com.example.week7project.domain.Post;
+import com.example.week7project.domain.PurchaseList;
 import com.example.week7project.domain.enums.Category;
 import com.example.week7project.dto.request.PostRequestDto;
 import com.example.week7project.dto.request.StatusRequestDto;
@@ -9,8 +11,10 @@ import com.example.week7project.dto.response.MyPostDto;
 import com.example.week7project.dto.response.PostResponseDto;
 import com.example.week7project.dto.response.PostListResponseDto;
 import com.example.week7project.dto.response.ResponseDto;
+import com.example.week7project.repository.ChatRoomRepository;
 import com.example.week7project.repository.MemberRepository;
 import com.example.week7project.repository.PostRepository;
+import com.example.week7project.repository.PurchaseListRepository;
 import com.example.week7project.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
+    private final PurchaseListRepository purchaseListRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     // 피드백 : if문에서 return이 있다면 else를 굳이 넣으시지 않으셔도 됩니다.
 
@@ -278,23 +284,56 @@ public class PostService {
     }
 
 
-    // 상품 상태 변경 (안쓸 예졍)
+    // 상품 상태 변경(판매중,예약중) (판매자,글 작성자 기준으로 진행됨)
     @Transactional
-    public ResponseDto<?> switchStatus(Long id, StatusRequestDto statusRequestDto, HttpServletRequest request) {
+    public ResponseDto<?> switchStatus(Long postId, StatusRequestDto statusRequestDto, HttpServletRequest request) {
         ResponseDto<?> chkResponse = validateCheck(request);
         if (!chkResponse.isSuccess())
             return chkResponse;
         Member member = (Member) chkResponse.getData();
         // 유저 테이블에서 유저객체 가져오기
-        Member updateMember = memberRepository.findByNickname(member.getNickname()).get();
+        Member updateMember = memberRepository.findByNickname(member.getNickname()).get(); // 판매자
 
-        Post post = isPresentPost(id);
+        Post post = isPresentPost(postId);
         if (null == post) {
             return ResponseDto.fail("글 조회 오류 (NOT_EXIST)");
         }
         // 작성자 검증
         if (post.validateMember(updateMember))
             return ResponseDto.fail("작성자가 아닙니다.");
+
+        post.changeStatus(statusRequestDto);
+
+        return ResponseDto.success(post.getStatus());
+    }
+
+    // 상품 상태 변경 (거래완료, 나눔완료)
+    @Transactional
+    public ResponseDto<?> switchStatusDone(Long roomId, StatusRequestDto statusRequestDto, HttpServletRequest request) {
+        ResponseDto<?> chkResponse = validateCheck(request);
+        if (!chkResponse.isSuccess())
+            return chkResponse;
+        Member member = (Member) chkResponse.getData();
+        // 유저 테이블에서 유저객체 가져오기
+        Member updateMember = memberRepository.findByNickname(member.getNickname()).get(); // 판매자
+        ChatRoom chatRoom;
+        Optional<ChatRoom> getRoom = chatRoomRepository.findById(roomId);
+        if(getRoom.isPresent())
+            chatRoom = getRoom.get();
+        else
+            return ResponseDto.fail("채팅방을 찾을 수 없습니다.");
+
+        Post post = chatRoom.getPost(); // 구매한 글
+        if (post.validateMember(updateMember))
+            return ResponseDto.fail("작성자가 아닙니다.");
+
+        Member buyer = chatRoom.getMember(); // 구매자
+
+        PurchaseList purchaseList = PurchaseList.builder()
+                .post(post)
+                .member(buyer)
+                .build();
+        purchaseListRepository.save(purchaseList);
 
         post.changeStatus(statusRequestDto);
 
