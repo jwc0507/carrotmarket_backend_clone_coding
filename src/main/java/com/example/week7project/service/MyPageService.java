@@ -89,6 +89,7 @@ public class MyPageService {
                             .id(post.getId())
                             .title(post.getTitle())
                             .imgUrl(post.getImageUrl())
+                            .status(post.getStatus())
                             .price(post.getPrice())
                             .build());
         }
@@ -119,6 +120,7 @@ public class MyPageService {
                             .id(list.getPost().getId())
                             .title(list.getPost().getTitle())
                             .imgUrl(list.getPost().getImageUrl())
+                            .status(list.getPost().getStatus())
                             .price(list.getPost().getPrice())
                             .build()
             );
@@ -149,6 +151,7 @@ public class MyPageService {
                             .id(list.getPost().getId())
                             .title(list.getPost().getTitle())
                             .imgUrl(list.getPost().getImageUrl())
+                            .status(list.getPost().getStatus())
                             .price(list.getPost().getPrice())
                             .build()
             );
