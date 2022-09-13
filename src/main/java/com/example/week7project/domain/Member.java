@@ -49,8 +49,11 @@ public class Member extends Timestamped{
     }
 
     //== 멤버 업데이트 메서드 ==//
-    public void updateMember(UpdateProfileDto updateProfileDto) {
-        this.nickname = updateProfileDto.getNickname();
-        this.address = updateProfileDto.getAddress();
+    public void updateNickname(UpdateProfileDto updateProfileDto) {
+        this.nickname = updateProfileDto.getValue();
+    }
+
+    public void updateAddress(UpdateProfileDto updateProfileDto) {
+        this.address = updateProfileDto.getValue();
     }
 }
