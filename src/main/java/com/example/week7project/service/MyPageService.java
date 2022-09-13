@@ -171,6 +171,7 @@ public class MyPageService {
                 MemberProfileDto.builder()
                         .nickname(repositoryMember.get().getNickname())
                         .id(repositoryMember.get().getId())
+                        .address(repositoryMember.get().getAddress())
                         .temperature(repositoryMember.get().getTemperature())
                         .numOfSale(numOfSale)
                         .build()
