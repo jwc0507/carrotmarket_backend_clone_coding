@@ -5,13 +5,11 @@ import com.example.week7project.domain.Post;
 import com.example.week7project.domain.enums.Category;
 import com.example.week7project.dto.request.PostRequestDto;
 import com.example.week7project.dto.request.StatusRequestDto;
-import com.example.week7project.dto.response.MyPostDto;
-import com.example.week7project.dto.response.PostResponseDto;
-import com.example.week7project.dto.response.PostListResponseDto;
-import com.example.week7project.dto.response.ResponseDto;
+import com.example.week7project.dto.response.*;
 import com.example.week7project.repository.MemberRepository;
 import com.example.week7project.repository.PostRepository;
 import com.example.week7project.security.TokenProvider;
+import com.example.week7project.time.Time;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,12 +36,13 @@ public class PostService {
 //        if (postList.isEmpty()) //Question. 여기 조건 어떻게 설정해야하는지? , Answer : 만약 list가 비어있는걸 찾고싶으시면 empty쓰시면 됩니다. 그러나 리스트가 비어있는건 오류사항이 아니므로 체크는 안해도됩니다.
 //            // 리스트가 비어있다 = 현재 작성된 글이 없다.
 //            return ResponseDto.fail("글 전체 조회 오류");
-        List<PostListResponseDto> postResponseDtoList = new ArrayList<>();
+        List<TimePostListResponseDto> postResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
-            postResponseDtoList.add(PostListResponseDto.builder()
+            postResponseDtoList.add(TimePostListResponseDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .imgUrl(post.getImageUrl())
+                    .time(Time.convertLocaldatetimeToTime(post.getCreatedAt()))
                     .price(post.getPrice())
                     .numOfChat(post.getNumOfChat())
                     .numOfWish(post.getNumOfWish())
@@ -65,7 +64,7 @@ public class PostService {
 
         Member member = post.getMember();
         return ResponseDto.success(
-                PostResponseDto.builder()
+                TimePostResponseDto.builder()
                         .id(post.getId())
                         .temperature(member.getTemperature())
                         .title(post.getTitle())
@@ -74,6 +73,7 @@ public class PostService {
                         .nickname(member.getNickname())
                         .address(member.getAddress())
                         .imgUrl(post.getImageUrl())
+                        .time(Time.convertLocaldatetimeToTime(post.getCreatedAt()))
                         .price(post.getPrice())
                         .content(post.getContent())
                         .numOfChat(post.getNumOfChat())
