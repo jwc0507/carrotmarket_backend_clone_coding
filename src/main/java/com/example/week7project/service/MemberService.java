@@ -32,6 +32,7 @@ public class MemberService {
         String phoneNumber = requestDto.getPhoneNumber();
         String nickName = requestDto.getNickname();
         String password = requestDto.getPassword();
+        String address = requestDto.getAddress();
 
         // null 인지 확인
         if(phoneNumber==null || nickName==null || password==null)
@@ -51,6 +52,7 @@ public class MemberService {
         Member newMember = Member.builder()
                 .phoneNumber(phoneNumber)
                 .nickname(nickName)
+                .address(address)
                 .password(passwordEncoder.encode(password))
                 .userRole(Authority.ROLE_MEMBER)
                 .temperature(36.5)

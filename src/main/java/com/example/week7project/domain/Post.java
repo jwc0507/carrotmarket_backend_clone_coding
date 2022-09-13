@@ -45,6 +45,9 @@ public class Post extends Timestamped{
     @Column
     private int numOfWish;
 
+    @Column
+    private int numOfWatch;
+
     //Question create_at은 멤버 정의 안 해줘도 되나?
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -80,5 +83,8 @@ public class Post extends Timestamped{
 
     public void addChatCount() {
         this.numOfChat++;
+    }
+    public void addWatch() {
+        this.numOfWatch++;
     }
 }

@@ -9,10 +9,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostListResponseDto {
+public class TimePostListResponseDto {
+
     private Long id;
     private String title;
     private String imgUrl;
+    private String time;
     private long price;
     private int numOfChat;
     private int numOfWish;
