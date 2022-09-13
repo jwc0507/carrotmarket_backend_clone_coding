@@ -30,4 +30,10 @@ public class ChatController {
     public ResponseDto<?> getChatRooms(HttpServletRequest request) {
         return chatService.getChatRooms(request);
     }
+
+    // 채팅방 메세지 조회
+    @RequestMapping (value = "/api/chat/message/{id}", method = RequestMethod.GET)
+    public ResponseDto<?> getMessage(@PathVariable Long id, HttpServletRequest request) {
+        return chatService.getMessage(id, request);
+    }
 }
