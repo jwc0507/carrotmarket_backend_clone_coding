@@ -61,6 +61,7 @@ public class PostService {
         if (null == post) {
             return ResponseDto.fail("글 조회 오류 (NOT_EXIST)");
         }
+        post.addWatch();
 
         Member member = post.getMember();
         return ResponseDto.success(
