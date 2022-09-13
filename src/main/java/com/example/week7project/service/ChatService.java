@@ -133,26 +133,28 @@ public class ChatService {
                 System.out.println("chatRoom = " + chatRoom.getId());
                 Long chatRoomId = chatRoom.getId();
                 Member buyer = chatRoom.getMember();
-                Long buyerId = buyer.getId();
                 String address = buyer.getAddress();
+                String buyerNickname = buyer.getNickname();
                 String message;
-                LocalDateTime lastTime;
+                String lastTime;
                 // == 채팅 내역 가져와야 함.
                 if (chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom).isEmpty()) {
-                    message = " ";
-                    lastTime = LocalDateTime.MIN;
+                    message = "메세지가 없습니다.";
+                    lastTime = "0초전";
                 } else {
                     List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom);
                     message = chatMessageList.get(0).getMessage();
-                    lastTime = chatMessageList.get(0).getCreatedAt();
+                    LocalDateTime getTime = chatMessageList.get(0).getCreatedAt();
+                    lastTime = Time.convertLocaldatetimeToTime(getTime);
                 }
+
                 chatDtoList.add(
                         MyChatDto.builder()
                                 .id(chatRoomId)
-                                .senderId(buyerId)
+                                .nickName(buyerNickname)
                                 .address(address)
                                 .message(message)
-                                .lastTime(Time.convertLocaldatetimeToTime(lastTime))
+                                .lastTime(lastTime)
                                 .build()
                 );
             }
@@ -164,26 +166,27 @@ public class ChatService {
             Long chatRoomId = chatRoom.getId();
             System.out.println("chatRoomId = " + chatRoomId);
             Member seller = chatRoom.getPost().getMember();
-            Long sellerId = seller.getId();
+            String sellerNickname = seller.getNickname();
             String address = seller.getAddress();
             String message;
-            LocalDateTime lastTime;
+            String lastTime;
             //== 채팅 내역 가져와야 함.
             if (chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom).isEmpty()) {
-                message = " ";
-                lastTime = LocalDateTime.MIN;
+                message = "메세지가 없습니다.";
+                lastTime = "0초전";
             } else {
                 List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom);
                 message = chatMessageList.get(0).getMessage();
-                lastTime = chatMessageList.get(0).getCreatedAt();
+                LocalDateTime getTime = chatMessageList.get(0).getCreatedAt();
+                lastTime = Time.convertLocaldatetimeToTime(getTime);
             }
             chatDtoList.add(
                     MyChatDto.builder()
                             .id(chatRoomId)
-                            .senderId(sellerId)
+                            .nickName(sellerNickname)
                             .address(address)
                             .message(message)
-                            .lastTime(Time.convertLocaldatetimeToTime(lastTime))
+                            .lastTime(lastTime)
                             .build()
             );
         }

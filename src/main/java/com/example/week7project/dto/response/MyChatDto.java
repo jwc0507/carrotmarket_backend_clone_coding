@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class MyChatDto {
     private Long id;
-    private Long senderId;
+    private String nickName;
     private String address;
     private String message;
     private String lastTime;
