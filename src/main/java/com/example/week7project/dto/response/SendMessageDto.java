@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class ChatMessageResponseDto {
+public class SendMessageDto {
     private Long roomId;
     private Long postId;
     private String sender;

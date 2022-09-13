@@ -2,13 +2,13 @@ package com.example.week7project.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Builder
 @Getter
-public class MyChatDto {
-    private Long id;
-    private String nickName;
-    private String address;
+@Setter
+public class ChatMsgResponseDto {
+    private String type;
+    private String nickname;
     private String message;
-    private String lastTime;
 }
