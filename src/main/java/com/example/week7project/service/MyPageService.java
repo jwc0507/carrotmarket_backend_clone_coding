@@ -2,21 +2,21 @@ package com.example.week7project.service;
 
 
 import com.example.week7project.domain.*;
+import com.example.week7project.dto.TokenDto;
 import com.example.week7project.dto.request.UpdateProfileDto;
 import com.example.week7project.dto.response.MemberProfileDto;
-import com.example.week7project.dto.response.MyChatDto;
 import com.example.week7project.dto.response.MyPostDto;
 import com.example.week7project.dto.response.ResponseDto;
 import com.example.week7project.repository.*;
 import com.example.week7project.security.TokenProvider;
-import com.example.week7project.time.Time;
-import com.sun.source.tree.TryTree;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 
 
@@ -30,8 +30,6 @@ public class MyPageService {
     private final PurchaseListRepository purchaseListRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final WishListRepository wishListRepository;
-    private final ChatRoomRepository chatRoomRepository;
-    private final ChatMessageRepository chatMessageRepository;
 
     /**
      * 멤버 프로필 수정
@@ -193,86 +191,7 @@ public class MyPageService {
         );
     }
 
-    /**
-     * 회원 채팅방 조회
-     */
-    public ResponseDto<?> getChatRooms(HttpServletRequest request) {
-        //== token 유효성 검사 ==//
-        ResponseDto<?> chkResponse = validateCheck(request);
 
-        if (!chkResponse.isSuccess())
-            return chkResponse;
-
-        Member member = (Member) chkResponse.getData();
-        List<MyChatDto> chatDtoList = new ArrayList<>();            // 채팅방 리스트 담을 용도
-        // 내가 쓴 글 기준으로 찾아오기
-        List<Post> postList = postRepository.findByMemberId(member.getId());
-        for (Post post : postList) {
-            System.out.println("post = " + post);
-            if (chatRoomRepository.findByPost(post) == null) {
-                continue;
-            } else {
-                ChatRoom chatRoom = chatRoomRepository.findByPost(post);
-                System.out.println("chatRoom = " + chatRoom.getId());
-                Long chatRoomId = chatRoom.getId();
-                Member buyer = chatRoom.getMember();
-                Long buyerId = buyer.getId();
-                String address = buyer.getAddress();
-                String message;
-                LocalDateTime lastTime;
-                // == 채팅 내역 가져와야 함.
-                if (chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom).isEmpty()) {
-                    message = " ";
-                    lastTime = LocalDateTime.MIN;
-                } else {
-                    List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom);
-                    message = chatMessageList.get(0).getMessage();
-                    lastTime = chatMessageList.get(0).getCreatedAt();
-                }
-                chatDtoList.add(
-                        MyChatDto.builder()
-                                .id(chatRoomId)
-                                .senderId(buyerId)
-                                .address(address)
-                                .message(message)
-                                .lastTime(Time.convertLocaldatetimeToTime(lastTime))
-                                .build()
-                );
-            }
-        }
-
-        // 내가 구매한 기준으로 찾아오기
-        List<ChatRoom> chatRooms = chatRoomRepository.findByMember(member);
-        for (ChatRoom chatRoom : chatRooms) {
-            Long chatRoomId = chatRoom.getId();
-            System.out.println("chatRoomId = " + chatRoomId);
-            Member seller = chatRoom.getPost().getMember();
-            Long sellerId = seller.getId();
-            String address = seller.getAddress();
-            String message;
-            LocalDateTime lastTime;
-            //== 채팅 내역 가져와야 함.
-            if (chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom).isEmpty()) {
-                message = " ";
-                lastTime = LocalDateTime.MIN;
-            } else {
-                List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom);
-                message = chatMessageList.get(0).getMessage();
-                lastTime = chatMessageList.get(0).getCreatedAt();
-            }
-            chatDtoList.add(
-                    MyChatDto.builder()
-                            .id(chatRoomId)
-                            .senderId(sellerId)
-                            .address(address)
-                            .message(message)
-                            .lastTime(Time.convertLocaldatetimeToTime(lastTime))
-                            .build()
-            );
-        }
-
-        return ResponseDto.success(chatDtoList);
-    }
 
 
     // RefreshToken 유효성 검사
