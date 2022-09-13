@@ -10,6 +10,7 @@ import com.example.week7project.dto.request.StatusRequestDto;
 
 import com.example.week7project.dto.response.*;
 
+import com.example.week7project.repository.ChatRoomRepository;
 import com.example.week7project.repository.MemberRepository;
 import com.example.week7project.repository.PostRepository;
 import com.example.week7project.repository.PurchaseListRepository;
@@ -85,6 +86,7 @@ public class PostService {
                         .content(post.getContent())
                         .numOfChat(post.getNumOfChat())
                         .numOfWish(post.getNumOfWish())
+                        .numOfWatch(post.getNumOfWatch())
                         .build()
         );
 
@@ -139,11 +141,12 @@ public class PostService {
 //                        .build()
 //        );
 
-        return ResponseDto.success(PostListResponseDto.builder()
+        return ResponseDto.success(TimePostListResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .imgUrl(post.getImageUrl())
                 .price(post.getPrice())
+                .time(Time.convertLocaldatetimeToTime(post.getCreatedAt()))
                 .numOfChat(post.getNumOfChat())
                 .numOfWish(post.getNumOfWish())
                 .build());
@@ -169,7 +172,7 @@ public class PostService {
 
         post.updatePost(requestDto);
         return ResponseDto.success(
-                PostResponseDto.builder()
+                TimePostResponseDto.builder()
                         .id(post.getId())
                         .temperature(updateMember.getTemperature())
                         .title(post.getTitle())
@@ -180,8 +183,10 @@ public class PostService {
                         .imgUrl(post.getImageUrl())
                         .price(post.getPrice())
                         .content(post.getContent())
+                        .time(Time.convertLocaldatetimeToTime(post.getCreatedAt()))
                         .numOfChat(post.getNumOfChat())
                         .numOfWish(post.getNumOfWish())
+                        .numOfWatch(post.getNumOfWatch())
                         .build()
         );
 
