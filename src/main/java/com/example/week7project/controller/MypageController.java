@@ -56,4 +56,10 @@ public class MypageController {
     public ResponseDto<?> getMemberProfile(HttpServletRequest request) {
         return myPageService.getMemberProfile(request);
     }
+
+    // 회원 채팅방 조회
+    @GetMapping("/api/chat")
+    public ResponseDto<?> getChatRooms(HttpServletRequest request) {
+        return myPageService.getChatRooms(request);
+    }
 }
