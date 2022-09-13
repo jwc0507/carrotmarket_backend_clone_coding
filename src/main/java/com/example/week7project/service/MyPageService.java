@@ -4,20 +4,19 @@ import com.example.week7project.domain.Member;
 import com.example.week7project.domain.Post;
 import com.example.week7project.domain.PurchaseList;
 import com.example.week7project.domain.WishList;
+import com.example.week7project.dto.TokenDto;
 import com.example.week7project.dto.request.UpdateProfileDto;
 import com.example.week7project.dto.response.MemberProfileDto;
 import com.example.week7project.dto.response.MyPostDto;
 import com.example.week7project.dto.response.ResponseDto;
-import com.example.week7project.repository.MemberRepository;
-import com.example.week7project.repository.PostRepository;
-import com.example.week7project.repository.PurchaseListRepository;
-import com.example.week7project.repository.WishListRepository;
+import com.example.week7project.repository.*;
 import com.example.week7project.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,30 +29,40 @@ public class MyPageService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final PurchaseListRepository purchaseListRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final WishListRepository wishListRepository;
 
     /**
      * 멤버 프로필 수정
      */
     @Transactional
-    public ResponseDto<?> updateProfile(UpdateProfileDto updateProfileDto, HttpServletRequest request) {
+    public ResponseDto<?> updateProfile(String type, UpdateProfileDto updateProfileDto, HttpServletRequest request, HttpServletResponse response) {
 
         //== token 유효성 검사 ==//
         ResponseDto<?> chkResponse = validateCheck(request);
 
         if(!chkResponse.isSuccess())
             return chkResponse;
-
         Member member = (Member) chkResponse.getData();
 
-        Optional<Member> findMember = memberRepository.findByPhoneNumber(member.getPhoneNumber());
-
-        if (findMember.isEmpty())
-            return ResponseDto.fail("회원이 존재하지 않습니다.");
+        Member updateMember = memberRepository.findById(member.getId()).get();
 
         // Member 객체 업데이트
-        findMember.get().updateMember(updateProfileDto);
-        return ResponseDto.success(findMember.get().getNickname() + " 수정완료");
+        if (type.equals("nickname"))
+            updateMember.updateNickname(updateProfileDto);
+        else if (type.equals("address"))
+            updateMember.updateAddress(updateProfileDto);
+
+        refreshTokenRepository.delete(refreshTokenRepository.findByMember(updateMember).get());
+
+        // 토큰 재생성
+        TokenDto tokenDto = tokenProvider.generateTokenDto(updateMember);
+
+        //헤더에 반환 to FE
+        response.addHeader("Authorization","Bearer "+tokenDto.getAccessToken());
+        response.addHeader("RefreshToken", tokenDto.getRefreshToken());
+
+        return ResponseDto.success(" 수정완료");
     }
 
     /**
@@ -173,6 +182,7 @@ public class MyPageService {
                 MemberProfileDto.builder()
                         .nickname(repositoryMember.get().getNickname())
                         .id(repositoryMember.get().getId())
+                        .address(repositoryMember.get().getAddress())
                         .temperature(repositoryMember.get().getTemperature())
                         .numOfSale(numOfSale)
                         .build()
