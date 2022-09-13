@@ -23,4 +23,5 @@ public class TimePostResponseDto {
     private String content;
     private int numOfChat;
     private int numOfWish;
+    private int numOfWatch;
 }

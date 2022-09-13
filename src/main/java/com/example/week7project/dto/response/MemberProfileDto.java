@@ -10,6 +10,7 @@ public class MemberProfileDto {
 
     private String nickname;
     private Long id;
+    private String address;
     private double temperature;
     private int numOfSale;
 }

@@ -9,5 +9,6 @@ public class MyPostDto {
     private Long id;
     private String title;
     private String imgUrl;
+    private String status;
     private Long price;
 }
