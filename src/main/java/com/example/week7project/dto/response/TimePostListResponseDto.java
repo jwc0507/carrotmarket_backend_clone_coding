@@ -15,6 +15,8 @@ public class TimePostListResponseDto {
     private String title;
     private String imgUrl;
     private String time;
+    private String status;
+    private String address;
     private long price;
     private int numOfChat;
     private int numOfWish;

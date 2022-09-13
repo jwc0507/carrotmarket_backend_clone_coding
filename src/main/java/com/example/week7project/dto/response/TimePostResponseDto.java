@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TimePostResponseDto {
     private Long id;
+    private Long sellerId;
     private double temperature;
     private String title;
     private String status;

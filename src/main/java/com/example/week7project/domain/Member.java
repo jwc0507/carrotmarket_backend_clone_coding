@@ -33,7 +33,7 @@ public class Member extends Timestamped{
     private String password;
 
     // 주소
-    @Column
+    @Column (nullable = false)
     private String address;
 
     // 유저 권한

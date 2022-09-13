@@ -51,6 +51,8 @@ public class PostService {
                     .title(post.getTitle())
                     .imgUrl(post.getImageUrl())
                     .time(Time.convertLocaldatetimeToTime(post.getCreatedAt()))
+                    .address(post.getMember().getAddress())
+                    .status(post.getStatus())
                     .price(post.getPrice())
                     .numOfChat(post.getNumOfChat())
                     .numOfWish(post.getNumOfWish())
@@ -74,6 +76,7 @@ public class PostService {
         return ResponseDto.success(
                 TimePostResponseDto.builder()
                         .id(post.getId())
+                        .sellerId(post.getMember().getId())
                         .temperature(member.getTemperature())
                         .title(post.getTitle())
                         .status(post.getStatus())
@@ -147,6 +150,8 @@ public class PostService {
                 .imgUrl(post.getImageUrl())
                 .price(post.getPrice())
                 .time(Time.convertLocaldatetimeToTime(post.getCreatedAt()))
+                .address(post.getMember().getAddress())
+                .status(post.getStatus())
                 .numOfChat(post.getNumOfChat())
                 .numOfWish(post.getNumOfWish())
                 .build());
@@ -174,6 +179,7 @@ public class PostService {
         return ResponseDto.success(
                 TimePostResponseDto.builder()
                         .id(post.getId())
+                        .sellerId(post.getMember().getId())
                         .temperature(updateMember.getTemperature())
                         .title(post.getTitle())
                         .status(post.getStatus())
@@ -325,7 +331,7 @@ public class PostService {
         Member updateMember = memberRepository.findByNickname(member.getNickname()).get(); // 판매자
         ChatRoom chatRoom;
         Optional<ChatRoom> getRoom = chatRoomRepository.findById(roomId);
-        if(getRoom.isPresent())
+        if (getRoom.isPresent())
             chatRoom = getRoom.get();
         else
             return ResponseDto.fail("채팅방을 찾을 수 없습니다.");
