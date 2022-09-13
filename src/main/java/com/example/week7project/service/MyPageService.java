@@ -1,9 +1,7 @@
 package com.example.week7project.service;
 
-import com.example.week7project.domain.Member;
-import com.example.week7project.domain.Post;
-import com.example.week7project.domain.PurchaseList;
-import com.example.week7project.domain.WishList;
+
+import com.example.week7project.domain.*;
 import com.example.week7project.dto.TokenDto;
 import com.example.week7project.dto.request.UpdateProfileDto;
 import com.example.week7project.dto.response.MemberProfileDto;
@@ -16,10 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.servlet.http.HttpServletResponse;
+
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +40,7 @@ public class MyPageService {
         //== token 유효성 검사 ==//
         ResponseDto<?> chkResponse = validateCheck(request);
 
-        if(!chkResponse.isSuccess())
+        if (!chkResponse.isSuccess())
             return chkResponse;
         Member member = (Member) chkResponse.getData();
 
@@ -73,7 +72,7 @@ public class MyPageService {
         //== token 유효성 검사 ==//
         ResponseDto<?> chkResponse = validateCheck(request);
 
-        if(!chkResponse.isSuccess())
+        if (!chkResponse.isSuccess())
             return chkResponse;
 
         Member member = (Member) chkResponse.getData();
@@ -104,7 +103,7 @@ public class MyPageService {
         //== token 유효성 검사 ==//
         ResponseDto<?> chkResponse = validateCheck(request);
 
-        if(!chkResponse.isSuccess())
+        if (!chkResponse.isSuccess())
             return chkResponse;
 
         Member member = (Member) chkResponse.getData();
@@ -135,7 +134,7 @@ public class MyPageService {
         //== token 유효성 검사 ==//
         ResponseDto<?> chkResponse = validateCheck(request);
 
-        if(!chkResponse.isSuccess())
+        if (!chkResponse.isSuccess())
             return chkResponse;
 
         Member member = (Member) chkResponse.getData();
@@ -166,7 +165,7 @@ public class MyPageService {
         //== token 유효성 검사 ==//
         ResponseDto<?> chkResponse = validateCheck(request);
 
-        if(!chkResponse.isSuccess())
+        if (!chkResponse.isSuccess())
             return chkResponse;
 
         Member member = (Member) chkResponse.getData();
@@ -191,6 +190,8 @@ public class MyPageService {
                         .build()
         );
     }
+
+
 
 
     // RefreshToken 유효성 검사
