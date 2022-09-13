@@ -1,5 +1,6 @@
 package com.example.week7project.service;
 
+
 import com.example.week7project.domain.*;
 import com.example.week7project.dto.request.UpdateProfileDto;
 import com.example.week7project.dto.response.MemberProfileDto;
@@ -16,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.*;
+import javax.servlet.http.HttpServletResponse;
+
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class MyPageService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final PurchaseListRepository purchaseListRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final WishListRepository wishListRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
@@ -34,24 +37,33 @@ public class MyPageService {
      * 멤버 프로필 수정
      */
     @Transactional
-    public ResponseDto<?> updateProfile(UpdateProfileDto updateProfileDto, HttpServletRequest request) {
+    public ResponseDto<?> updateProfile(String type, UpdateProfileDto updateProfileDto, HttpServletRequest request, HttpServletResponse response) {
 
         //== token 유효성 검사 ==//
         ResponseDto<?> chkResponse = validateCheck(request);
 
         if (!chkResponse.isSuccess())
             return chkResponse;
-
         Member member = (Member) chkResponse.getData();
 
-        Optional<Member> findMember = memberRepository.findByPhoneNumber(member.getPhoneNumber());
-
-        if (findMember.isEmpty())
-            return ResponseDto.fail("회원이 존재하지 않습니다.");
+        Member updateMember = memberRepository.findById(member.getId()).get();
 
         // Member 객체 업데이트
-        findMember.get().updateMember(updateProfileDto);
-        return ResponseDto.success(findMember.get().getNickname() + " 수정완료");
+        if (type.equals("nickname"))
+            updateMember.updateNickname(updateProfileDto);
+        else if (type.equals("address"))
+            updateMember.updateAddress(updateProfileDto);
+
+        refreshTokenRepository.delete(refreshTokenRepository.findByMember(updateMember).get());
+
+        // 토큰 재생성
+        TokenDto tokenDto = tokenProvider.generateTokenDto(updateMember);
+
+        //헤더에 반환 to FE
+        response.addHeader("Authorization","Bearer "+tokenDto.getAccessToken());
+        response.addHeader("RefreshToken", tokenDto.getRefreshToken());
+
+        return ResponseDto.success(" 수정완료");
     }
 
     /**
@@ -78,6 +90,7 @@ public class MyPageService {
                             .id(post.getId())
                             .title(post.getTitle())
                             .imgUrl(post.getImageUrl())
+                            .status(post.getStatus())
                             .price(post.getPrice())
                             .build());
         }
@@ -108,6 +121,7 @@ public class MyPageService {
                             .id(list.getPost().getId())
                             .title(list.getPost().getTitle())
                             .imgUrl(list.getPost().getImageUrl())
+                            .status(list.getPost().getStatus())
                             .price(list.getPost().getPrice())
                             .build()
             );
@@ -138,6 +152,7 @@ public class MyPageService {
                             .id(list.getPost().getId())
                             .title(list.getPost().getTitle())
                             .imgUrl(list.getPost().getImageUrl())
+                            .status(list.getPost().getStatus())
                             .price(list.getPost().getPrice())
                             .build()
             );

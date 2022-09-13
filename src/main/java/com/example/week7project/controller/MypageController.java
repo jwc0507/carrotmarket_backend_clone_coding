@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,11 +19,18 @@ public class MypageController {
 
     private final MyPageService myPageService;
 
-    // 회원 정보 수정
-    @PutMapping("/api/user")
-    public ResponseDto<?> updateProfile(@RequestBody UpdateProfileDto updateProfileDto,
-                                        HttpServletRequest request) {
-        return myPageService.updateProfile(updateProfileDto, request);
+    // 닉네임 수정
+    @PutMapping("/api/user/nickname")
+    public ResponseDto<?> updateNickname(@RequestBody UpdateProfileDto updateProfileDto,
+                                         HttpServletRequest request, HttpServletResponse response) {
+        return myPageService.updateProfile("nickname", updateProfileDto, request, response);
+    }
+
+    // 주소 수정
+    @PutMapping("/api/user/address")
+    public ResponseDto<?> updateAddress(@RequestBody UpdateProfileDto updateProfileDto,
+                                        HttpServletRequest request, HttpServletResponse response) {
+        return myPageService.updateProfile("address", updateProfileDto, request, response);
     }
 
     // 판매글 목록조회
