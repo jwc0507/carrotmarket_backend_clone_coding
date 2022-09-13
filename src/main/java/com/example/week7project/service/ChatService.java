@@ -5,6 +5,7 @@ import com.example.week7project.domain.ChatRoom;
 import com.example.week7project.domain.Member;
 import com.example.week7project.domain.Post;
 import com.example.week7project.dto.request.ChatRoomRequestDto;
+import com.example.week7project.dto.response.ChatMsgResponseDto;
 import com.example.week7project.dto.response.MyChatDto;
 import com.example.week7project.dto.response.ResponseDto;
 import com.example.week7project.repository.ChatMessageRepository;
@@ -192,6 +193,40 @@ public class ChatService {
         }
 
         return ResponseDto.success(chatDtoList);
+    }
+
+    // 채팅방 메세지들 불러오기
+    public ResponseDto<?> getMessage(Long roomId, HttpServletRequest request) {
+        ResponseDto<?> chkResponse = validateCheck(request);
+        if (!chkResponse.isSuccess())
+            return chkResponse;
+
+        Optional<ChatRoom> getChatRoom = chatRoomRepository.findById(roomId);
+        ChatRoom chatRoom;
+        if(getChatRoom.isPresent())
+            chatRoom = getChatRoom.get();
+        else
+            return ResponseDto.fail("채팅방을 찾을 수 없습니다.");
+
+        Long buyerId = chatRoom.getMember().getId();
+        String type = "";
+
+        List<ChatMessage> chatMessageList = chatMessageRepository.findAllByChatRoomOrderByCreatedAtDesc(chatRoom);
+        List<ChatMsgResponseDto> chatMsgResponseDtos = new ArrayList<>();
+        for(ChatMessage chatMessage : chatMessageList) {
+            Member member = chatMessage.getMember();
+            if(member.getId().equals(buyerId))
+                type = "구매자";
+            else
+                type = "판매자";
+            ChatMsgResponseDto chatMsgResponseDto = ChatMsgResponseDto.builder()
+                    .type(type)
+                    .nickname(member.getNickname())
+                    .message(chatMessage.getMessage())
+                    .build();
+            chatMsgResponseDtos.add(chatMsgResponseDto);
+        }
+        return ResponseDto.success(chatMsgResponseDtos);
     }
 
 }
