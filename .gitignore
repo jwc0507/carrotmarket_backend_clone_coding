@@ -30,6 +30,7 @@ memberTest.http
 socketTest.http
 postTest.http
 myPageTest.http
+townTest.http
 
 ### NetBeans ###
 /nbproject/private/
