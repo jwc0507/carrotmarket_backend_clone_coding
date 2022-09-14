@@ -69,4 +69,10 @@ public class PostController {
     public ResponseDto<?> switchStatusDone(@PathVariable Long id, @RequestBody StatusRequestDto statusRequestDto, HttpServletRequest request) {
         return postService.switchStatusDone(id, statusRequestDto, request);
     }
+
+    // 판매글 채팅방 목록 불러오기 (id와 구매자만)
+    @RequestMapping (value = "/api/post/getchatlist/{id}", method = RequestMethod.GET)
+    public ResponseDto<?> getChatList(@PathVariable Long id, HttpServletRequest request) {
+        return postService.getPostChatRoom(id, request);
+    }
 }
