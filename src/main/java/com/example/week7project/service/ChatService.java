@@ -127,37 +127,37 @@ public class ChatService {
         List<Post> postList = postRepository.findByMemberId(member.getId());
         for (Post post : postList) {
             System.out.println("post = " + post);
-            if (chatRoomRepository.findByPost(post) == null) {
-                continue;
-            } else {
-                ChatRoom chatRoom = chatRoomRepository.findByPost(post);
-                System.out.println("chatRoom = " + chatRoom.getId());
-                Long chatRoomId = chatRoom.getId();
-                Member buyer = chatRoom.getMember();
-                String address = buyer.getAddress();
-                String buyerNickname = buyer.getNickname();
-                String message;
-                String lastTime;
-                // == 채팅 내역 가져와야 함.
-                if (chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom).isEmpty()) {
-                    message = "메세지가 없습니다.";
-                    lastTime = "0초전";
-                } else {
-                    List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom);
-                    message = chatMessageList.get(0).getMessage();
-                    LocalDateTime getTime = chatMessageList.get(0).getCreatedAt();
-                    lastTime = Time.convertLocaldatetimeToTime(getTime);
-                }
+            if (chatRoomRepository.findByPost(post) != null) {
+                List<ChatRoom> chatRoomList = chatRoomRepository.findByPost(post);
+                for (ChatRoom chatRoom : chatRoomList) {
+                    System.out.println("chatRoom = " + chatRoom.getId());
+                    Long chatRoomId = chatRoom.getId();
+                    Member buyer = chatRoom.getMember();
+                    String address = buyer.getAddress();
+                    String buyerNickname = buyer.getNickname();
+                    String message;
+                    String lastTime;
+                    // == 채팅 내역 가져와야 함.
+                    if (chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom).isEmpty()) {
+                        message = "메세지가 없습니다.";
+                        lastTime = "0초전";
+                    } else {
+                        List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom);
+                        message = chatMessageList.get(0).getMessage();
+                        LocalDateTime getTime = chatMessageList.get(0).getCreatedAt();
+                        lastTime = Time.convertLocaldatetimeToTime(getTime);
+                    }
 
-                chatDtoList.add(
-                        MyChatDto.builder()
-                                .id(chatRoomId)
-                                .nickName(buyerNickname)
-                                .address(address)
-                                .message(message)
-                                .lastTime(lastTime)
-                                .build()
-                );
+                    chatDtoList.add(
+                            MyChatDto.builder()
+                                    .id(chatRoomId)
+                                    .nickName(buyerNickname)
+                                    .address(address)
+                                    .message(message)
+                                    .lastTime(lastTime)
+                                    .build()
+                    );
+                }
             }
         }
 
@@ -203,19 +203,19 @@ public class ChatService {
 
         Optional<ChatRoom> getChatRoom = chatRoomRepository.findById(roomId);
         ChatRoom chatRoom;
-        if(getChatRoom.isPresent())
+        if (getChatRoom.isPresent())
             chatRoom = getChatRoom.get();
         else
             return ResponseDto.fail("채팅방을 찾을 수 없습니다.");
 
         Long buyerId = chatRoom.getMember().getId();
-        String type = "";
+        String type;
 
         List<ChatMessage> chatMessageList = chatMessageRepository.findAllByChatRoomOrderByCreatedAtDesc(chatRoom);
         List<ChatMsgResponseDto> chatMsgResponseDtos = new ArrayList<>();
-        for(ChatMessage chatMessage : chatMessageList) {
+        for (ChatMessage chatMessage : chatMessageList) {
             Member member = chatMessage.getMember();
-            if(member.getId().equals(buyerId))
+            if (member.getId().equals(buyerId))
                 type = "구매자";
             else
                 type = "판매자";
