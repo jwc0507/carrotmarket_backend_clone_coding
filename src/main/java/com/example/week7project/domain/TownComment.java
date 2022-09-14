@@ -1,6 +1,7 @@
 package com.example.week7project.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Builder
 public class TownComment extends Timestamped {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
