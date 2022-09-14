@@ -7,6 +7,7 @@ import com.example.week7project.dto.TownCommentDto;
 import com.example.week7project.dto.response.ResponseDto;
 import com.example.week7project.dto.response.TownCommentResponseDto;
 import com.example.week7project.repository.TownCommentRepository;
+import com.example.week7project.repository.TownPostRepository;
 import com.example.week7project.security.TokenProvider;
 import com.example.week7project.time.Time;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +36,12 @@ public class TownCommentService {
             return chkResponse;
         Member member = (Member) chkResponse.getData();
 
-        TownPost townPost = townPostRepository.findById(postId);
-
-        if (townPost == null) {
+        Optional<TownPost> getTownPost = townPostRepository.findById(postId);
+        TownPost townPost;
+        if (getTownPost.isPresent())
+            townPost = getTownPost.get();
+        else
             return ResponseDto.fail("게시글이 존재하지 않습니다.");
-        }
 
         TownComment townComment = TownComment
                 .builder()
@@ -49,6 +52,8 @@ public class TownCommentService {
 
         townCommentRepository.save(townComment);
 
+        townPost.addCommentCount(1);
+
         return ResponseDto.success(
                 TownCommentResponseDto.builder()
                         .id(townComment.getId())
@@ -57,6 +62,7 @@ public class TownCommentService {
                         .address(townComment.getMember().getAddress())
                         .content(townComment.getContent())
                         .time(Time.convertLocaldatetimeToTime(townComment.getCreatedAt()))
+                        .build()
         );
     }
 
@@ -64,9 +70,15 @@ public class TownCommentService {
         ResponseDto<?> chkResponse = validateCheck(request);
         if (!chkResponse.isSuccess())
             return chkResponse;
-        Member member = (Member) chkResponse.getData();
 
-        List<TownComment> townComments = townCommentRepository.findByPostId(postId);
+        Optional<TownPost> getTownPost = townPostRepository.findById(postId);
+        TownPost townPost;
+        if (getTownPost.isPresent())
+            townPost = getTownPost.get();
+        else
+            return ResponseDto.fail("게시글이 존재하지 않습니다.");
+
+        List<TownComment> townComments = townCommentRepository.findByTownPost(townPost);
         List<TownCommentResponseDto> townCommentResponseDtoList = new ArrayList<>();
 
         for (TownComment townComment : townComments) {
