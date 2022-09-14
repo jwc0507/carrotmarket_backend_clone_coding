@@ -13,21 +13,21 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Builder
-public class TownPost extends Timestamped{
+public class TownPost extends Timestamped {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private String content;
 
     @Column
     private String imgUrl;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private int numOfComment;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private int numOfWatch;
 
     @JoinColumn(name = "member_id", nullable = false)
@@ -39,5 +39,12 @@ public class TownPost extends Timestamped{
 
     public void addWatchCount() {
         this.numOfWatch++;
+    }
+
+    public void addCommentCount(int num) {
+        if (this.numOfComment + num > 0)
+            this.numOfComment += num;
+        else
+            this.numOfComment = 0;
     }
 }

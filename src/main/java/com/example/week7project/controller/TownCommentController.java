@@ -11,20 +11,20 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
-public class TownController {
+public class TownCommentController {
 
     private final TownCommentService townCommentService;
 
     //댓글 쓰기
     @PostMapping("/api/towncomment/{id}")
-    public ResponseDto<?> writeComment(@PathVariable Long postId, @RequestBody TownCommentDto townCommentDto, HttpServletRequest request) {
-        return townCommentService.writeComment(postId, townCommentDto, request);
+    public ResponseDto<?> writeComment(@PathVariable Long id, @RequestBody TownCommentDto townCommentDto, HttpServletRequest request) {
+        return townCommentService.writeComment(id, townCommentDto, request);
     }
 
     //댓글 목록 가져오기
     @GetMapping("/api/towncomment/{id}")
-    public ResponseDto<?> readAllComments(@PathVariable Long postId,  HttpServletRequest request) {
-        return townCommentService.readAllComments(postId, request);
+    public ResponseDto<?> readAllComments(@PathVariable Long id,  HttpServletRequest request) {
+        return townCommentService.readAllComments(id, request);
     }
 
 
