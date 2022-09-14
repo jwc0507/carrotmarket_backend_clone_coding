@@ -10,6 +10,7 @@ import com.example.week7project.dto.response.MyChatDto;
 import com.example.week7project.dto.response.ResponseDto;
 import com.example.week7project.repository.ChatMessageRepository;
 import com.example.week7project.repository.ChatRoomRepository;
+import com.example.week7project.repository.MemberRepository;
 import com.example.week7project.repository.PostRepository;
 import com.example.week7project.security.TokenProvider;
 import com.example.week7project.time.Time;
@@ -34,20 +35,27 @@ public class ChatService {
     private final ObjectMapper objectMapper;
     private final PostRepository postRepository;
     private final TokenProvider tokenProvider;
+    private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
 
+    // 채팅방 개설
+    // 내 게시글에 방만들지 못하게 수정
     @Transactional
     public ResponseDto<?> createRoom(Long postId, ChatRoomRequestDto requestDto, HttpServletRequest request) {
         ResponseDto<?> chkResponse = validateCheck(request);
         if (!chkResponse.isSuccess())
             return ResponseDto.fail(chkResponse);
-        Member member = validateMember(request);
+        Member member = (Member) chkResponse.getData();
         if (member == null)
             return ResponseDto.fail("사용자를 찾을 수 없습니다.");
+
+        Member updateMember = memberRepository.findByNickname(member.getNickname()).get(); // 판매자
         Optional<Post> getPost = postRepository.findById(postId);
         if (getPost.isEmpty())
             return ResponseDto.fail("게시글을 찾을 수 없습니다.");
+        if(!getPost.get().validateMember(updateMember))
+            return ResponseDto.fail("자신의 글에 채팅을 걸 수 없습니다.");
 
         ChatRoom chatRoom = ChatRoom.builder()
                 .name(requestDto.getRoomName())
@@ -96,16 +104,16 @@ public class ChatService {
         ResponseDto<?> chkResponse = validateCheck(request);
         if (!chkResponse.isSuccess())
             return ResponseDto.fail(chkResponse);
-        Member member = validateMember(request);
-        if (member == null)
-            return ResponseDto.fail("사용자를 찾을 수 없습니다.");
+        Member member = (Member) chkResponse.getData();
+
+        Member updateMember = memberRepository.findByNickname(member.getNickname()).get();
 
         Optional<Post> getPost = postRepository.findById(postId);
         if (getPost.isEmpty())
             return ResponseDto.fail("게시글을 찾을 수 없습니다.");
 
 
-        ChatRoom chatRoom = chatRoomRepository.findByMemberAndPost(member, getPost.get());
+        ChatRoom chatRoom = chatRoomRepository.findByMemberAndPost(updateMember, getPost.get());
         if (chatRoom == null)
             return ResponseDto.success(0);
         return ResponseDto.success(chatRoom.getId());
@@ -113,6 +121,7 @@ public class ChatService {
 
     /**
      * 회원 채팅방 조회
+     * 중복된 방이 있으면 넣지 않기
      */
     public ResponseDto<?> getChatRooms(HttpServletRequest request) {
         //== token 유효성 검사 ==//
@@ -120,17 +129,16 @@ public class ChatService {
 
         if (!chkResponse.isSuccess())
             return chkResponse;
-
         Member member = (Member) chkResponse.getData();
+        Member updateMember = memberRepository.findByNickname(member.getNickname()).get();
+
         List<MyChatDto> chatDtoList = new ArrayList<>();            // 채팅방 리스트 담을 용도
         // 내가 쓴 글 기준으로 찾아오기
-        List<Post> postList = postRepository.findByMemberId(member.getId());
+        List<Post> postList = postRepository.findByMemberId(updateMember.getId());
         for (Post post : postList) {
-            System.out.println("post = " + post);
             if (chatRoomRepository.findByPost(post) != null) {
                 List<ChatRoom> chatRoomList = chatRoomRepository.findByPost(post);
                 for (ChatRoom chatRoom : chatRoomList) {
-                    System.out.println("chatRoom = " + chatRoom.getId());
                     Long chatRoomId = chatRoom.getId();
                     Member buyer = chatRoom.getMember();
                     String address = buyer.getAddress();
@@ -151,6 +159,7 @@ public class ChatService {
                     chatDtoList.add(
                             MyChatDto.builder()
                                     .id(chatRoomId)
+                                    .roomName(chatRoom.getName())
                                     .nickName(buyerNickname)
                                     .address(address)
                                     .message(message)
@@ -162,11 +171,12 @@ public class ChatService {
         }
 
         // 내가 구매한 기준으로 찾아오기
-        List<ChatRoom> chatRooms = chatRoomRepository.findByMember(member);
+        List<ChatRoom> chatRooms = chatRoomRepository.findByMember(updateMember);
         for (ChatRoom chatRoom : chatRooms) {
             Long chatRoomId = chatRoom.getId();
-            System.out.println("chatRoomId = " + chatRoomId);
             Member seller = chatRoom.getPost().getMember();
+            if(seller.getId().equals(updateMember.getId()))
+                continue;
             String sellerNickname = seller.getNickname();
             String address = seller.getAddress();
             String message;
@@ -184,6 +194,7 @@ public class ChatService {
             chatDtoList.add(
                     MyChatDto.builder()
                             .id(chatRoomId)
+                            .roomName(chatRoom.getName())
                             .nickName(sellerNickname)
                             .address(address)
                             .message(message)
@@ -191,7 +202,6 @@ public class ChatService {
                             .build()
             );
         }
-
         return ResponseDto.success(chatDtoList);
     }
 
