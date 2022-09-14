@@ -352,4 +352,36 @@ public class PostService {
 
         return ResponseDto.success(post.getStatus());
     }
+
+    // 게시글 채팅방 조회
+    public ResponseDto<?> getPostChatRoom(Long postId, HttpServletRequest request) {
+        //== token 유효성 검사 ==//
+        ResponseDto<?> chkResponse = validateCheck(request);
+        if (!chkResponse.isSuccess())
+            return chkResponse;
+        Member member = (Member) chkResponse.getData();
+        // 유저 테이블에서 유저객체 가져오기
+        Member updateMember = memberRepository.findByNickname(member.getNickname()).get(); // 판매자
+
+        Optional<Post> getPost = postRepository.findById(postId);
+        Post post;
+        if (getPost.isPresent())
+            post = getPost.get();
+        else
+            return ResponseDto.fail("게시글 아이디가 잘못되었습니다.");
+        if (post.validateMember(updateMember))
+            return ResponseDto.fail("작성자가 아닙니다.");
+
+        List<PostChatRoomResponseDto> list = new ArrayList<>();
+
+        List<ChatRoom> chatRoomList = chatRoomRepository.findByPost(post);
+        for (ChatRoom chatRoom : chatRoomList) {
+            list.add(PostChatRoomResponseDto.builder()
+                    .roomId(chatRoom.getId())
+                    .roomName(chatRoom.getName())
+                    .buyerNickname(chatRoom.getMember().getNickname())
+                    .build());
+        }
+        return ResponseDto.success(list);
+    }
 }
