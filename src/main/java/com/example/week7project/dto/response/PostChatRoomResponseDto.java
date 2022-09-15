@@ -11,4 +11,6 @@ public class PostChatRoomResponseDto {
     private Long roomId;
     private String roomName;
     private String buyerNickname;
+    private String address;
+    private String time;
 }
