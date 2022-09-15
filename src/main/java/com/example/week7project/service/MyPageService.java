@@ -79,10 +79,10 @@ public class MyPageService {
         Member member = (Member) chkResponse.getData();
 
         List<Post> sellList = postRepository.findByMemberId(member.getId());
-        if (sellList.isEmpty())
-            return ResponseDto.fail("판매한 내역이 없습니다.");
-
         List<MyPostDto> myPostDtoList = new ArrayList<>();
+        if (sellList.isEmpty())
+            return ResponseDto.success(myPostDtoList);
+
         for (Post post : sellList) {
             myPostDtoList.add(
                     MyPostDto.builder()
@@ -114,10 +114,10 @@ public class MyPageService {
         Member member = (Member) chkResponse.getData();
 
         List<PurchaseList> purchaseList = purchaseListRepository.findByMemberId(member.getId());
-        if (purchaseList.isEmpty())
-            return ResponseDto.fail("구매한 내역이 없습니다.");
-
         List<MyPostDto> myPostDtoList = new ArrayList<>();
+        if (purchaseList.isEmpty())
+            return ResponseDto.success(myPostDtoList);
+
         for (PurchaseList list : purchaseList) {
             myPostDtoList.add(
                     MyPostDto.builder()
@@ -149,10 +149,10 @@ public class MyPageService {
         Member member = (Member) chkResponse.getData();
 
         List<WishList> wishList = wishListRepository.findByMemberId(member.getId());
-        if (wishList.isEmpty())
-            return ResponseDto.fail("관심상품이 없습니다.");
-
         List<MyPostDto> myPostDtoList = new ArrayList<>();
+        if (wishList.isEmpty())
+            return ResponseDto.success(myPostDtoList);
+
         for (WishList list : wishList) {
             myPostDtoList.add(
                     MyPostDto.builder()
