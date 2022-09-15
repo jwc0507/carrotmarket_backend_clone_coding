@@ -33,6 +33,7 @@ public class PostService {
     private final TokenProvider tokenProvider;
     private final PurchaseListRepository purchaseListRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatService chatService;
 
     // 피드백 : if문에서 return이 있다면 else를 굳이 넣으시지 않으셔도 됩니다.
 
@@ -254,7 +255,7 @@ public class PostService {
     // 연관 카테고리 상품목록 조회
     public ResponseDto<?> getCategoryList(Long postId) {
         Post post = isPresentPost(postId);
-        List<MyPostDto> postDtoList = new ArrayList<>();
+        List<MyCategoryPostDto> postDtoList = new ArrayList<>();
         if (null == post)
             return ResponseDto.success(postDtoList);    // 연관카테고리 글 없으면 그냥 빈 리스트 주면됨
 
@@ -264,7 +265,7 @@ public class PostService {
 
         for (int i = 0, n = posts.size(); i < n && i < 4; i++) {
             Post p = posts.get(i);
-            MyPostDto myPostDto = MyPostDto.builder()
+            MyCategoryPostDto myPostDto = MyCategoryPostDto.builder()
                     .id(p.getId())
                     .title(p.getTitle())
                     .imgUrl(p.getImageUrl())
@@ -280,11 +281,11 @@ public class PostService {
     // 판매자 상품 목록 조회
     public ResponseDto<?> getProductList(Long sellerId) {
         List<Post> posts = postRepository.findByMemberId(sellerId);
-        List<MyPostDto> postDtoList = new ArrayList<>();
+        List<MyCategoryPostDto> postDtoList = new ArrayList<>();
 
         for (int i = 0, n = posts.size(); i < n && i < 10; i++) {
             Post p = posts.get(i);
-            MyPostDto myPostDto = MyPostDto.builder()
+            MyCategoryPostDto myPostDto = MyCategoryPostDto.builder()
                     .id(p.getId())
                     .title(p.getTitle())
                     .imgUrl(p.getImageUrl())
@@ -372,14 +373,20 @@ public class PostService {
         if (post.validateMember(updateMember))
             return ResponseDto.fail("작성자가 아닙니다.");
 
+
         List<PostChatRoomResponseDto> list = new ArrayList<>();
 
         List<ChatRoom> chatRoomList = chatRoomRepository.findByPost(post);
         for (ChatRoom chatRoom : chatRoomList) {
+
+            LastChatDto lastChatDto = chatService.getLastMessage(chatRoom);
+
             list.add(PostChatRoomResponseDto.builder()
                     .roomId(chatRoom.getId())
                     .roomName(chatRoom.getName())
                     .buyerNickname(chatRoom.getMember().getNickname())
+                    .address(chatRoom.getMember().getAddress())
+                    .time(lastChatDto.getTime())
                     .build());
         }
         return ResponseDto.success(list);

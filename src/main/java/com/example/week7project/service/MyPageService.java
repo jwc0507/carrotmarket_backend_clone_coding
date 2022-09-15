@@ -9,6 +9,7 @@ import com.example.week7project.dto.response.MyPostDto;
 import com.example.week7project.dto.response.ResponseDto;
 import com.example.week7project.repository.*;
 import com.example.week7project.security.TokenProvider;
+import com.example.week7project.time.Time;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,6 +91,10 @@ public class MyPageService {
                             .imgUrl(post.getImageUrl())
                             .status(post.getStatus())
                             .price(post.getPrice())
+                            .address(post.getMember().getAddress())
+                            .time(Time.convertLocaldatetimeToTime(post.getCreatedAt()))
+                            .numOfChatroom(post.getNumOfChat())
+                            .numOfWish(post.getNumOfWish())
                             .build());
         }
         return ResponseDto.success(myPostDtoList);
@@ -121,6 +126,10 @@ public class MyPageService {
                             .imgUrl(list.getPost().getImageUrl())
                             .status(list.getPost().getStatus())
                             .price(list.getPost().getPrice())
+                            .address(list.getPost().getMember().getAddress())
+                            .time(Time.convertLocaldatetimeToTime(list.getPost().getCreatedAt()))
+                            .numOfChatroom(list.getPost().getNumOfChat())
+                            .numOfWish(list.getPost().getNumOfWish())
                             .build()
             );
         }
@@ -152,6 +161,10 @@ public class MyPageService {
                             .imgUrl(list.getPost().getImageUrl())
                             .status(list.getPost().getStatus())
                             .price(list.getPost().getPrice())
+                            .address(list.getPost().getMember().getAddress())
+                            .time(Time.convertLocaldatetimeToTime(list.getPost().getCreatedAt()))
+                            .numOfChatroom(list.getPost().getNumOfChat())
+                            .numOfWish(list.getPost().getNumOfWish())
                             .build()
             );
         }

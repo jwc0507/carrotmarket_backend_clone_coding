@@ -6,6 +6,7 @@ import com.example.week7project.domain.Member;
 import com.example.week7project.domain.Post;
 import com.example.week7project.dto.request.ChatRoomRequestDto;
 import com.example.week7project.dto.response.ChatMsgResponseDto;
+import com.example.week7project.dto.response.LastChatDto;
 import com.example.week7project.dto.response.MyChatDto;
 import com.example.week7project.dto.response.ResponseDto;
 import com.example.week7project.repository.ChatMessageRepository;
@@ -143,18 +144,8 @@ public class ChatService {
                     Member buyer = chatRoom.getMember();
                     String address = buyer.getAddress();
                     String buyerNickname = buyer.getNickname();
-                    String message;
-                    String lastTime;
-                    // == 채팅 내역 가져와야 함.
-                    if (chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom).isEmpty()) {
-                        message = "메세지가 없습니다.";
-                        lastTime = "0초전";
-                    } else {
-                        List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom);
-                        message = chatMessageList.get(0).getMessage();
-                        LocalDateTime getTime = chatMessageList.get(0).getCreatedAt();
-                        lastTime = Time.convertLocaldatetimeToTime(getTime);
-                    }
+
+                    LastChatDto lastChatDto = getLastMessage(chatRoom);
 
                     chatDtoList.add(
                             MyChatDto.builder()
@@ -162,8 +153,8 @@ public class ChatService {
                                     .roomName(chatRoom.getName())
                                     .nickName(buyerNickname)
                                     .address(address)
-                                    .message(message)
-                                    .lastTime(lastTime)
+                                    .message(lastChatDto.getMessage())
+                                    .lastTime(lastChatDto.getTime())
                                     .build()
                     );
                 }
@@ -179,30 +170,39 @@ public class ChatService {
                 continue;
             String sellerNickname = seller.getNickname();
             String address = seller.getAddress();
-            String message;
-            String lastTime;
-            //== 채팅 내역 가져와야 함.
-            if (chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom).isEmpty()) {
-                message = "메세지가 없습니다.";
-                lastTime = "0초전";
-            } else {
-                List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom);
-                message = chatMessageList.get(0).getMessage();
-                LocalDateTime getTime = chatMessageList.get(0).getCreatedAt();
-                lastTime = Time.convertLocaldatetimeToTime(getTime);
-            }
+
+            LastChatDto lastChatDto = getLastMessage(chatRoom);
             chatDtoList.add(
                     MyChatDto.builder()
                             .id(chatRoomId)
                             .roomName(chatRoom.getName())
                             .nickName(sellerNickname)
                             .address(address)
-                            .message(message)
-                            .lastTime(lastTime)
+                            .message(lastChatDto.getMessage())
+                            .lastTime(lastChatDto.getTime())
                             .build()
             );
         }
         return ResponseDto.success(chatDtoList);
+    }
+
+    // 가장 최근 메세지 한개만 불러오기
+    public LastChatDto getLastMessage(ChatRoom chatRoom) {
+        String message;
+        String lastTime;
+        List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomOrderByCreatedAtDesc(chatRoom);
+        if (chatMessageList.isEmpty()) {
+            message = "메세지가 없습니다.";
+            lastTime = "0초전";
+        } else {
+            message = chatMessageList.get(0).getMessage();
+            LocalDateTime getTime = chatMessageList.get(0).getCreatedAt();
+            lastTime = Time.convertLocaldatetimeToTime(getTime);
+        }
+        return LastChatDto.builder()
+                .message(message)
+                .time(lastTime)
+                .build();
     }
 
     // 채팅방 메세지들 불러오기
