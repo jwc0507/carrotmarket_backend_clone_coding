@@ -1,18 +1,23 @@
 package com.example.week7project.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Getter
-public class MyPostDto {
+@NoArgsConstructor
+@AllArgsConstructor
+public class TimePostListResponseDto {
+
     private Long id;
     private String title;
     private String imgUrl;
-    private String status;
-    private Long price;
-    private String address;
     private String time;
-    private int numOfChatroom;
+    private String status;
+    private String address;
+    private long price;
+    private int numOfChat;
     private int numOfWish;
 }

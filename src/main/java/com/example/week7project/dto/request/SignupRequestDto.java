@@ -8,6 +8,7 @@ import lombok.Setter;
 // 회원가입 요청 dto
 public class SignupRequestDto {
     private String phoneNumber;
+    private String address;
     private String nickname;
     private String password;
 }

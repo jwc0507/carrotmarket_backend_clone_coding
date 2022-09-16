@@ -5,14 +5,11 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class MyPostDto {
+public class TownCommentResponseDto {
     private Long id;
-    private String title;
-    private String imgUrl;
-    private String status;
-    private Long price;
+    private Long townPostId;
+    private String nickname;
     private String address;
+    private String content;
     private String time;
-    private int numOfChatroom;
-    private int numOfWish;
 }
